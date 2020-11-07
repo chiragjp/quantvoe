@@ -15,7 +15,7 @@
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-#' @keywords regression, initial assocatiation
+#' @keywords regression, initial association
 regression <- function(j,independent_variables,dependent_variables,primary_variable,model_type,proportion_cutoff,family,ids,strata,weights,nest){
   feature_name = colnames(dependent_variables)[j+1]
   regression_df=suppressMessages(dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))
@@ -58,7 +58,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-#' @keywords regression, initial assocatiation
+#' @keywords regression, initial association
 run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vibrate,family,ids,strata,weights,nest){
   dependent_variables <- dplyr::as_tibble(x[[1]])
   colnames(dependent_variables)[[1]]='sampleID'
@@ -123,7 +123,7 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
-#' @keywords regression, initial assocatiation
+#' @keywords regression, initial association
 #' @export
 compute_initial_associations <- function(bound_data,primary_variable, model_type, proportion_cutoff,vibrate,family,ids,strata,weights,nest){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,model_type,proportion_cutoff,vibrate,family,ids,strata,weights,nest))

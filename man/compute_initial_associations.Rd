@@ -10,7 +10,11 @@ compute_initial_associations(
   model_type,
   proportion_cutoff,
   vibrate,
-  regression_weights
+  family,
+  ids,
+  strata,
+  weights,
+  nest
 )
 }
 \arguments{
@@ -18,17 +22,25 @@ compute_initial_associations(
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
 
-\item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
+\item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at leaset weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as an additional argument to this function.}
 
 \item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
 
 \item{vibrate}{TRUE/FALSE -- run vibrations (default=TRUE)}
 
-\item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
+\item{family}{GLM family (default = gaussian()). For help see help(glm) or help(family).}
+
+\item{ids}{Name of column in dataframe specifying cluster ids from largest level to smallest level. Only relevant for survey data. (Default = NULL).}
+
+\item{strata}{Name of column in dataframe with strata. Relevant for survey data. (Default = NULL).}
+
+\item{weights}{Name of column containing sampling weights.}
+
+\item{nest}{If TRUE, relabel cluster ids to enforce nesting within strata.}
 }
 \description{
 Top-level function to run all associations for all datasets.
 }
-\keyword{assocatiation}
+\keyword{association}
 \keyword{initial}
 \keyword{regression,}

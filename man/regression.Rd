@@ -11,27 +11,39 @@ regression(
   primary_variable,
   model_type,
   proportion_cutoff,
-  regression_weights
+  family,
+  ids,
+  strata,
+  weights,
+  nest
 )
 }
 \arguments{
-\item{j}{feature name}
+\item{j}{dependent feature name}
 
-\item{independent_variables}{A tibble containing the independent variables you will want to vibrate over. Each column should correspond to a different variable (e.g. age), with the first column containing the sample names matching those in the column names of the dependent_variables tibble.}
+\item{independent_variables}{A tibble containing the information for your independent variables (e.g. bacteria relative abundance, age). The columns should correspond to different variables, and the rows should correspond to different units,  (e.g. individual1, individual2, etc). If passing multiple datasets, pass a named list of the same length and in the same order as the dependent_variables parameter. If running from the command line, pass the path (or comma separated paths) to .rds files containing the data, one per dataset.}
 
-\item{dependent_variables}{A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The first column should be the rownames (e.g. gene1, gene2, gene3), and the columns should correspond to different samples (e.g. individual1, individual2, etc).}
+\item{dependent_variables}{A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The columns should correspond to different variables, and the rows should correspond to different units, such as individuals (e.g. individual1, individual2, etc). If passing multiple datasets, pass a named list of the same length and in the same order as the independent_variables parameter. If running from the command line, pass the path (or comma separated paths) to .rds files containing the data, one per dataset.}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
 
-\item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
+\item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at least weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as the family argument to this function.}
 
 \item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
 
-\item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
+\item{family}{GLM family (default = gaussian()). For help see help(glm) or help(family).}
+
+\item{ids}{Name of column in dataframe specifying cluster ids from largest level to smallest level. Only relevant for survey data. (Default = NULL).}
+
+\item{strata}{Name of column in dataframe with strata. Relevant for survey data. (Default = NULL).}
+
+\item{weights}{Name of column containing sampling weights.}
+
+\item{nest}{If TRUE, relabel cluster ids to enforce nesting within strata.}
 }
 \description{
 Run initial association for a single feature
 }
-\keyword{assocatiation}
+\keyword{association}
 \keyword{initial}
 \keyword{regression,}

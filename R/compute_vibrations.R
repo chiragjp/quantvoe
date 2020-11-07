@@ -14,7 +14,7 @@
 #' @param ids Name of column in dataframe pecifying cluster ids from largest level to smallest level. Only relevant for survey data. (Default = NULL).]
 #' @param strata Name of column in dataframe with strata. Only relevant for survey data. (Default = NULL).]
 #' @param weights Name of column containing sampling weights.
-#' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.#' @keywords regression, initial assocatiation
+#' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.#' @keywords regression, initial association
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,primary_variable,model_type,max_vibration_num,dataset_id,proportion_cutoff,family,ids,strata,weights,nest){
@@ -88,7 +88,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
-#' @keywords regression, initial assocatiation
+#' @keywords regression, initial association
 dataset_vibration <-function(subframe,primary_variable,model_type,features_of_interest,max_vibration_num, proportion_cutoff,cores,max_vars_in_model,family,ids,strata,weights,nest){
   print(paste('Computing vibrations for',length(features_of_interest),'features in dataset number',subframe[[3]]))
   dep_sub = subframe[[1]]
@@ -131,7 +131,7 @@ dataset_vibration <-function(subframe,primary_variable,model_type,features_of_in
 #' @param strata Name of column in dataframe with strata. Only relevant for survey data. (Default = NULL).
 #' @param weights Name of column containing sampling weights.
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata
-#' @keywords regression, initial assocatiation
+#' @keywords regression, initial association
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @export

@@ -11,10 +11,14 @@ vibrate(
   feature,
   primary_variable,
   model_type,
-  regression_weights,
   max_vibration_num,
   dataset_id,
-  proportion_cutoff
+  proportion_cutoff,
+  family,
+  ids,
+  strata,
+  weights,
+  nest
 )
 }
 \arguments{
@@ -22,25 +26,30 @@ vibrate(
 
 \item{variables_to_vibrate}{Variables over which you're going to vibrate.}
 
-\item{max_vars_in_model}{Maximum number of variables allowed in in a model.}
+\item{max_vars_in_model}{Maximum number of variables allowed in a single fit in vibrations. In case an individual has many hundreds of metadata features, this prevents models from being fit with excessive numbers of variables. Setting this parameter will improve runtime for large datasets. (default=NULL)}
 
 \item{feature}{Feature over which to vibrate.}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
 
-\item{model_type}{Model family (e.g. gaussian, binomial, etc). Will determine if you are doing classification or regression. See GLM families for more information. (default="gaussian")}
+\item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at least weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as the family argument to this function.}
 
-\item{regression_weights}{Column in independent variable dataset(s) corresponding to weights  for linear regression input (default = NULL).}
-
-\item{max_vibration_num}{Maximum number of vibrations (default=50000).}
+\item{max_vibration_num}{Maximum number of vibrations allowed for a single dependent variable. Setting this will also reduce runtime by reducing the number of models fit. (default = 10,000)}
 
 \item{dataset_id}{Identifier for dataset.}
 
-\item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering done.)}
+\item{proportion_cutoff}{Float between 0 and 1. Filter out dependent features that are this proportion of zeros or more (default = 1, so no filtering will be done.)}
+
+\item{family}{GLM family (default = gaussian()). For help see help(glm) or help(family).}
+
+\item{ids}{Name of column in dataframe pecifying cluster ids from largest level to smallest level. Only relevant for survey data. (Default = NULL).]}
+
+\item{strata}{Name of column in dataframe with strata. Only relevant for survey data. (Default = NULL).]}
+
+\item{weights}{Name of column containing sampling weights.}
+
+\item{nest}{If TRUE, relabel cluster ids to enforce nesting within strata.#' @keywords regression, initial association}
 }
 \description{
 Run vibrations for a single feature
 }
-\keyword{assocatiation}
-\keyword{initial}
-\keyword{regression,}
