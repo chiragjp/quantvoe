@@ -23,11 +23,11 @@ Imports:
     MASS,
     survey,
     stringr,
+    stats,
     rlang,
     meta,
     broom,
     rje,
-    ggplot2
 RoxygenNote: 7.1.1
 Suggests: 
     testthat,

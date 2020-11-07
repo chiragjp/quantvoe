@@ -1,4 +1,4 @@
 library(testthat)
-library(voe)
+library(quantvoe)
 
-test_check("voe")
+test_check("quantvoe")
