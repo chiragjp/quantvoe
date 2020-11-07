@@ -1,0 +1,36 @@
+Package: voe
+Type: Package
+Title: Modeling vibrational effects in observational data
+Version: 0.1.0
+Author: Braden Tierney [aut], Elizabeth Anderson [aut], Yingxuan Tan [aut]
+Maintainer: Braden Tierney <btierney@g.harvard.edu>
+Description: Description of the tool. 
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr,
+    furrr,
+    future,
+    lme4,
+    broom.mixed,
+    tibble,
+    purrr,
+    tidyr,
+    magrittr,
+    MASS,
+    survey,
+    stringr,
+    rlang,
+    meta,
+    broom,
+    rje,
+    ggplot2
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat,
+    getopt,
+    lmerTest,
+    cowplot
+
