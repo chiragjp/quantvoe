@@ -31,13 +31,13 @@ You might hypothesize that cholesterol would have some association, either negat
 
 quantvoe executes this approach process at massive scale, fitting (up to) every possible model given as set of adjusting variables, determining 1) how the association between your primary variable and dependent variable changes and 2) what the adjusters that appear to drive the change are. You end up with a plot like the one below, where each point represents a model and (the y-values are p-values, the x values are the effect size of the association between physical activity and blood pressure, and the line represents statistical signicance).
 
-![VoE for total cholesterol ~ physical activity](../main/images/LBXTC_physical_activity.png) 
+![VoE for total cholesterol ~ physical activity](../main/images/LBXTC_physical_activity.png =250x250 ) 
 
 To learn more about vibration of effects, take a look at:
 
-https://www.chiragjpgroup.org/voe/
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4555355/
-https://academic.oup.com/ije/advance-article/doi/10.1093/ije/dyaa164/5956264
+* https://www.chiragjpgroup.org/voe/
+* https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4555355/
+* https://academic.oup.com/ije/advance-article/doi/10.1093/ije/dyaa164/5956264
 
 ### Overview of the algorithmic approach
 
