@@ -72,6 +72,8 @@ R CMD install quantvoe_0.1.0.tar.gz
 We are in the process of submitting to CRAN, and expect it to be accessible 
 through `install.packages('quantvoe')` shortly.
 
+Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")`.
+
 ## Usage 
 
 ### Command line
@@ -80,34 +82,56 @@ For most analyses where you want to run our pipeline from end-to-end (raw data i
 
 ### Command line options
 
+|     Name              | Flag | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Required? |
+|-----------------------|------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| dependent_variables   |  -d  | The path to a tibble (saved as an rds)  containing the information for your   dependent variables (e.g. bacteria relative abundance, age). The columns   should correspond to different variables, and the rows should correspond to   different units, such as individuals (e.g. individual1, individual2, etc). If   inputting multiple datasets in order to run a meta-an analyais, pass a comma   separated list of paths to the location of your saved tibbles (one per   dataset). Be sure to not include spaces in the list or commas in the   paths/filenames themselves.  | Yes       |
+| independent_variables |  -i  | The path to a tibble (saved as an rds) containing the information   for your independent variables (e.g. bacteria relative abundance, age). The   columns should correspond to different variables, and the rows should   correspond to different units,  (e.g. individual1, individual2, etc). If   inputting multiple datasets in order to run a meta-an analyais, pass a comma   separated list of paths to the location of your saved tibbles (one per   dataset). Be sure to not include spaces in the list or commas in the paths/filenames   themselves.                    | Yes       |
+| primary_variable      |  -v  | The primary independent variable of interest.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Yes       |
+| output                |  -o  | Path to and name of output .rds file (e.g. ./output.rds) .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Yes       |
+| fdr_method            |  -m  | Your choice of method for adjusting p-values. Options are BY   (default), BH, or bonferroni. Adjustment is computed for all initial, single   variable, associations across all dependent features.                                                                                                                                                                                                                                                                                                                                                                                | No        |
+| fdr_cutoff            |  -c  | Cutoff for an FDR significant association. All features with   adjusted p-values initially under this value will be selected for vibrations.   (default = 0.05). Setting a stringent FDR cutoff is mostly relevant when you   are using a large number of dependent variables (eg >50) and want to   filter those with weak initial associations.                                                                                                                                                                                                                                  | No        |
+| proportion_cutoff     |  -g  | A float between 0 and 1. Setting this filters out dependent   features that are this proportion of zeros or more (default = 1, so no   filtering will be done.)                                                                                                                                                                                                                                                                                                                                                                                                                    | No        |
+| vibrate               |  -b  | TRUE/FALSE -- run vibrations (default = TRUE).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No        |
+| max_vars_in_model     |  -r  | Maximum number of variables allowed in a single fit in vibrations.   In case an individual has many hundreds of metadata features, this prevents   models from being fit with excessive numbers of variables. Setting this   parameter will improve runtime for large datasets. (default=NULL)                                                                                                                                                                                                                                                                                     | No        |
+| max_vibration_num     |  -r  | Maximum number of vibrations allowed for a single dependent   variable. Setting this will also reduce runtime by reducing the number of   models fit. (default = 10,000)                                                                                                                                                                                                                                                                                                                                                                                                           | No        |
+| meta_analysis         |  -a  | TRUE/FALSE -- indicates if computing meta-analysis across multiple   datasets. Set to TRUE by default if the pipeline detects multiple datasets.   Setting this variable to TRUE but providing one dataset will throw an error.                                                                                                                                                                                                                                                                                                                                                    | No        |
+| model_type            |  -u  | Specifies regression type -- "glm", "survey",   or "negative_binomial". Survey regression will require additional   parameters (at least weight, nest, strata, and ids). Any model family (e.g.   gaussian()), or any other parameter can be passed as the family argument to   this function.                                                                                                                                                                                                                                                                                     | No        |
+| family                |  -p  | GLM family (default = gaussian()). For help see help(glm) or   help(family).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | No        |
+| ids                   |  -k  | Name of column in dataframe specifying cluster ids from largest   level to smallest level. Only relevant for survey data. (Default = NULL).]                                                                                                                                                                                                                                                                                                                                                                                                                                       | No        |
+| strata                |  -s  | Name of column in dataframe with strata. Relevant for survey data.   (Default = NULL).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | No        |
+| weights               |  -w  | Name of column containing sampling weights.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | No        |
+| nest                  |  -q  | If TRUE, relabel cluster ids to enforce nesting within strata.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No        |
+| cores                 |  -t  | Number of cores to use for vibration (default = 1).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | No        |
+| confounder_analysis   |  -y  | TRUE/FALSE -- run mixed effect confounder analysis (default=TRUE).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | No        |
 
 ### R terminal
 
 If you are interested in running just a component of our pipeline (e.g. vibrations only), you can use the R terminal to access the requisite specific functions, each of which has particular input requirements described in the R documentation. 
 
-
-## Usage (R terminal)
-
-
 ## Output
 
-VoE
+Both our R terminal and command line implementations output a named list containing the following data structures:
 
-| Inputs | 
-| --------- | ----------- |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
-| Options  |
-| --------- | ----------- |
-|  |  |
-|  |  |
-|  |  |
-|  |  |
+
 
 ## Testing
 
+
+## Example command-line deployments
+
+All of these examples can be run using the files in the [data folder](XXX). For a more in-depth example that that explores the pipeline output, check out our [vignette](XXX)
+
+### Beginner
+
+Compute VoE for the association between BMI and physical activity.
+
+### Intermediate
+
+Compute VoE for multiple dependent variables (BMI and blood pressure) and physical activity with customized parameters.
+
+### Meta-analytic madman
+
+Compute VoE for multiple dependent variable (BMI and blood pressure) and physical activity with across multiple datasets.
     
 ## FAQ
 
@@ -130,9 +154,9 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 
 ## Author
 
-* Braden Tierney
-* Web: 
-* LinkedIn: 
-* Twitter: 
-* Scholar: 
+* Braden T Tierney
+* Web: https://www.bradentierney.com/
+* Twitter: https://twitter.com/BradenTierney
+* LinkedIn: https://www.linkedin.com/in/bradentierney/
+* Scholar: https://scholar.google.com/citations?user=6oSRYqMAAAAJ&hl=en&authuser=1&oi=ao
 
