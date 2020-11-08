@@ -175,37 +175,37 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 
 ## Package dependencies 
 
-Depends: 
-    * R (>= 3.5.0)
-Imports:
-    * dplyr
-    * furrr
-    * future
-    * lme4
-    * broom.mixed
-    * tibble
-    * purrr
-    * tidyr
-    * magrittr
-    * MASS
-    * survey
-    * stringr
-    * stats
-    * rlang
-    * meta
-    * broom
-    * rje
-Suggests: 
-    * testthat
-    * getopt
-    * lmerTest
-    * cowplot
+### Depends: 
+* R (>= 3.5.0)
+### Imports:
+* dplyr
+* furrr
+* future
+* lme4
+* broom.mixed
+* tibble
+* purrr
+* tidyr
+* magrittr
+* MASS
+* survey
+* stringr
+* stats
+* rlang
+* meta
+* broom
+* rje
+### Suggests: 
+* testthat
+* getopt
+* lmerTest
+* cowplot
 
 # License
 
 [MIT](https://github.com/chiragjp/quantvoe/blob/main/LICENSE)
 
-## Author
+# Author
 
 * Braden T Tierney
 * Web: https://www.bradentierney.com/
