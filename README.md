@@ -86,7 +86,13 @@ Note that the command line implementation requires the "optparse" library, which
 
 ### Command line
 
-For most analyses where you want to run our pipeline from end-to-end (raw data input, initial associations, vibrations, and analysis of vibrations), we recommend you use our command line implementation. The script we use to run this is in the root directory of our Github repository. It can be downloaded manually or cloned with the repo itself during the build process. It has the same options (see below) as the R terminal implementation, with the key differences being that you need to point it to saved .rds files containing your independent and dependent variables and additionally specify an output location/filename.
+For most analyses where you want to run our pipeline from end-to-end (raw data > initial associations > vibrations > analysis of vibrations), we recommend you use our command line implementation. The script we use to run this is in the root directory of our Github repository. It can be downloaded manually or cloned with the repo itself during the build process. It is called with the `Rscript` command and has the nearly identical options as the R terminal function `full_voe_pipeline()`, with the key differences being that you need to point it to saved .rds files containing your independent and dependent variables and additionally specify an output location/filename.
+
+To display the options for the command line tool:
+
+```
+Rscript voe_command_line_deployment.R -h
+```
 
 ### Command line options
 
@@ -152,18 +158,41 @@ All of these examples can be run using the files in the [data folder](XXX). For 
 
 ### Beginner
 
-Compute VoE for the association between BMI and physical activity.
+Compute VoE for the association between BMI and systolic blood pressure with the default settings.
+
+```
+
+Rscript voe_command_line_deployment.R 
+
+```
 
 ### Intermediate
 
-Compute VoE for multiple dependent variables (BMI and blood pressure) and physical activity with customized parameters.
+Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) with customized parameters (100 vibrations per dependent variable, 2 cores, max of 10 variables per model, FDR cutoff of 1 (vibrate over all initial association output)).
+
+
+```
+
+Rscript voe_command_line_deployment.R
+
+```
+
 
 ### Meta-analytic madman
 
-Compute VoE for multiple dependent variable (BMI and blood pressure) and physical activity with across multiple datasets.
+Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting (250 vibrations per dependent variable, 2 cores, max of 20 variables per model, FDR cutoff of 1 (vibrate over all initial association output)).
+
+
+```
+
+Rscript voe_command_line_deployment.R
+
+```
+
     
 ## FAQ
 
+Common questions or issues will be put here for easy reference.
 
 ## Bugs
 
@@ -173,10 +202,11 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 
 
 
-## Package dependencies 
+## Package requirements 
 
 ### Depends: 
 * R (>= 3.5.0)
+
 ### Imports:
 * dplyr
 * furrr
@@ -195,6 +225,7 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 * meta
 * broom
 * rje
+
 ### Suggests: 
 * testthat
 * getopt
