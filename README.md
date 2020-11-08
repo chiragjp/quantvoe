@@ -45,6 +45,14 @@ https://www.chiragjpgroup.org/voe/
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4555355/
 https://academic.oup.com/ije/advance-article/doi/10.1093/ije/dyaa164/5956264
 
+### Overview of the algorithmic approach. 
+
+![VoE pipeline](../main/images/FIG_overview.png)
+
+A) VoE takes three types of input data, all in the form of pairs of dataframes, either at the command line or in an interactive R session: 1) a single dependent variable and multiple independent variables, 2) multiple dependent variables, or 3) multiple datasets. The first column of the independent AND dependent dataframes must correspond to subject of sample IDs, and the independent dataframe must also contain a column corresponding to the primary variable of interest. In the event that the user passes multiple datasets (with a independent and dependent variable dataframe for each one), a meta-analysis will be run as part of the initial association step. 
+
+B) There are 4 main steps -- checking the input data, computing initial univariate associations, computing vibrations across possible adjusters, and quantifying how adjuster presence/absence correlates to changes in the primary association of interest. 
+
 ## Installation
 
 To install the most recent development version, install and use R's devtools package:
@@ -66,19 +74,17 @@ through `install.packages('quantvoe')` shortly.
 
 ## Usage 
 
-![VoE pipeline](../main/images/FIG_overview.png)
-
-Overview of the algorithmic approach. 
-
-A) VoE takes three types of input data, all in the form of pairs of dataframes, either at the command line or in an interactive R session: 1) a single dependent variable and multiple independent variables, 2) multiple dependent variables, or 3) multiple datasets. The first column of the independent AND dependent dataframes must correspond to subject of sample IDs, and the independent dataframe must also contain a column corresponding to the primary variable of interest. In the event that the user passes multiple datasets (with a independent and dependent variable dataframe for each one), a meta-analysis will be run as part of the initial association step. 
-
-B) There are 4 main steps -- checking the input data, computing initial univariate associations, computing vibrations across possible adjusters, and quantifying how adjuster presence/absence correlates to changes in the primary association of interest. 
-
 ### Command line
+
+For large analyses where you want to run our pipeline from end-to-end (raw data input, initial associations, vibrations, and analysis of vibrations), we recommend you use our command line implementation. The script we use to run this is in the root directory of our Github repository. It can be downloaded manually or cloned with the repo itself during the build process. It has the same options (see below) as the R terminal implementation, with the key differences being that you need to point it to saved .rds files containing your independent and dependent variables and additionally specify an output location/filename.
 
 ### R terminal
 
+If you are interested in running just a component of our pipeline (e.g. vibrations only), you can use the R terminal to access the requisite specific functions, each of which has particular input requirements described in the R documentation. 
+
 ### Options
+
+
 
 ## Usage (R terminal)
 
