@@ -22,7 +22,7 @@ physical activity and BMI. We'll refer to physical activity as the "primary vari
 the "dependent variable."
 
 ```
-BMI ~ physical_activity
+body_mass_index ~ physical_activity
 
 <other model>
 ``` 
