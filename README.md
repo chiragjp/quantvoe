@@ -158,34 +158,34 @@ All of these examples can be run using the files in the [data folder](XXX). For 
 
 ### Beginner
 
-Compute VoE for the association between BMI and systolic blood pressure with the default settings.
+Compute VoE for the association between systolic blood pressure and physical activity with 100 vibrations, an FDR cutoff of 1 (forcing vibrations to be computed regardless of significance in initial association) and otherwise the default settings.
 
 ```
 
-Rscript voe_command_line_deployment.R 
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_physact.rds -n 100 -c 1
 
 ```
 
 ### Intermediate
 
-Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) with customized parameters (100 vibrations per dependent variable, 2 cores, max of 10 variables per model, FDR cutoff of 1 (vibrate over all initial association output)).
+Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) with customized parameters: 100 vibrations per dependent variable, 2 cores, max of 10 variables per model, FDR cutoff of 1 (which will result in vibrating over all initial association output, regardless of significance).
 
 
 ```
 
-Rscript voe_command_line_deployment.R
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact.rds -c 1 -n 100 -r 10 -t 2
 
 ```
 
 
 ### Meta-analytic madman
 
-Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting (250 vibrations per dependent variable, 2 cores, max of 20 variables per model, FDR cutoff of 1 (vibrate over all initial association output)).
+Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting: 100 vibrations per dependent variable, 4 cores, max of 20 variables per model, FDR cutoff of 1 (vibrate over all initial association output).
 
 
 ```
 
-Rscript voe_command_line_deployment.R
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds,data/example_data_dataset_2_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds,example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey
 
 ```
 
