@@ -9,7 +9,7 @@ and it permeates any field that uses observational data (which is most fields). 
 of effects allows researchers to figure out what the most robust and reliable associations are, 
 which is ensuring our models are actually useful. We built this package to measure 
 vibration of effects, fitting hundreds, thousands, potentially millions of models to show 
-exactly how consistent an association output is. Quant_voe can be used for everything from 
+exactly how consistent an association output is. quantvoe can be used for everything from 
 clinical to economic data to tackle this problem, moving observational data science towards 
 consistent reproducibility.
 
@@ -18,7 +18,7 @@ consistent reproducibility.
 The goal of modeling VoE is to use linear modeling to explore, in detail, every way you can model 
 a single correlation. When you a model "adjust" by different variables, the initial association 
 you're looking at can change. For example if you fit the following models in an attempt to explore 
-physical activity and BMI. We'll refer to physical activity as the "primary variable" and BMI as 
+physical activity and cholesterol levels. We'll refer to physical activity as the "primary variable" and total cholesterol as 
 the "dependent variable."
 
 ```
@@ -27,17 +27,11 @@ body_mass_index ~ physical_activity
 <other model>
 ``` 
 
-We, and others, have shown that in the first equation you'll see a negative coefficient on the 
-physical -- the more physical activity, the lower BMI. However, we have also shown that if you 
-fit the second model you'll actually see the opposite sign coefficient -- a positive one, which 
-would imply that the more you exercise, the higher your BMI will be. This kind of result indicates 
-a confounded (and potentially clinically/biologically interesting) relationship between BMI, physical 
-activity, and XXX.
+You might hypothesize that cholesterol would have some association, either negative or positive, with physical activity. It turns out you can actually see either relationship depending on how you look at it -- a positive one in the first model, a negative one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between physical activity, cholesterol, and the other "adjusting variables" above.
 
-quantvoe executes this approach process at massive scale, fitting (up to) every possible model given 
-as set of "adjusters" (like adjuster 1 and adjuster 2 above), determining 1) how the association 
-between your primary variable and dependent variable changes and 2) what the adjusters that appear 
-to drive the change are.
+quantvoe executes this approach process at massive scale, fitting (up to) every possible model given as set of adjusting variables, determining 1) how the association between your primary variable and dependent variable changes and 2) what the adjusters that appear to drive the change are. You end up with a plot like the one below, where each point represents a model and (the y-values are p-values, the x values are the effect size of the association between physical activity and blood pressure, and the line represents statistical signicance).
+
+![VoE for total cholesterol ~ physical activity](../main/images/LBXTC_physical_activity.png) 
 
 To learn more about vibration of effects, take a look at:
 
