@@ -66,7 +66,7 @@ through `install.packages('quantvoe')` shortly.
 
 ## Usage 
 
-![VoE pipeline](https://github.com/chiragjp/quantvoe/blob/main/images/FIG_overview.pdf)
+![VoE pipeline](/images/FIG_overview.pdf)
 Overview of the algorithmic approach and application to cardiovascular disease. A) VoE takes three types of input data, all in the form of pairs of dataframes, either at the command line or in an interactive R session: 1) a single dependent variable and multiple independent variables, 2) multiple dependent variables, or 3) multiple datasets. B) There are 4 main steps -- checking the input data, computing initial univariate associations, computing vibrations across possible adjusters, and quantifying how adjuster presence/absence correlates to changes in the primary association of interest. 
 
 ###Input data structure
