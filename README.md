@@ -140,13 +140,13 @@ Both our R terminal and command line implementations output a named list contain
 
 ## Testing
 
-Unit tests can be deployed by running, in the R terminal after loading the package:
+Unit tests can be deployed by running the following in the R terminal after loading the package:
 
 ```
 devtools::test('/path/to/package/repository')
 ```
 
-or at the command line:
+or after building at the command line:
 
 ```
 R CMD check /path/to/package/binary
