@@ -150,7 +150,7 @@ R CMD check /path/to/package/binary
 
 ## Example command-line deployments
 
-All of these examples can be run using the files in the [data folder](XXX). For a more in-depth example that that explores the pipeline output, check out our [vignette](XXX)
+All of these examples can be run using the files in the [data folder](https://github.com/chiragjp/quantvoe/tree/main/data). For a more in-depth example that that explores the pipeline output, check out our package [vignette](https://github.com/chiragjp/quantvoe/tree/main/vignettes)
 
 ### Beginner
 
