@@ -24,7 +24,7 @@ the "dependent variable."
 ```
 total_cholesterol ~ physical_activity + eosinophils_percent + protein_intake + vitamin_E
 
- total_cholesterol ~ physical_activity + triceps_skinfold_size + hepatitis_B + alkaline_phosphatase_levels + stomach_cancer + b-Cryptoxanthin_levels + prescription_drug_use
+total_cholesterol ~ physical_activity + triceps_skinfold_size + hepatitis_B + alkaline_phosphatase_levels + stomach_cancer + b-Cryptoxanthin_levels + prescription_drug_use
 ``` 
 
 You might hypothesize that cholesterol would have some association, either negative or positive, with physical activity. It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between physical activity, cholesterol, and the other "adjusting variables" above.
