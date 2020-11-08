@@ -30,7 +30,7 @@ total_cholesterol ~ physical_activity + eosinophils_percent + protein_intake + v
 You might hypothesize that cholesterol would have some association, either negative or positive, with physical activity. It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between physical activity, cholesterol, and the other "adjusting variables" above.
 
 quantvoe executes this approach process at massive scale, fitting (up to) every possible model given as set of adjusting variables, determining 1) how the association between your primary variable and dependent variable changes and 2) what the adjusters that appear to drive the change are. You end up with a plot like the one below, where each point represents a model and (the y-values are p-values, the x values are the effect size of the association between physical activity and total cholesterol, and the line represents statistical signicance). 
-<img src="https://github.com/chiragjp/quantvoe/blob/main/images/LBXTC_physical_activity.png" width="300" height="300">
+<img src="https://github.com/chiragjp/quantvoe/blob/main/images/LBXTC_physical_activity.pdf" width="300" height="300">
 
 As you can see, you have about a 50% chance of seeing a negative or positive, statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
 
