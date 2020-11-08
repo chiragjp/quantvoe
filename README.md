@@ -158,7 +158,7 @@ Compute VoE for the association between systolic blood pressure and physical act
 
 ```
 
-Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_physact.rds -n 100 -c 1
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_physact.rds -n 1 -c 1
 
 ```
 
@@ -169,7 +169,7 @@ Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and p
 
 ```
 
-Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact.rds -c 1 -n 100 -r 10 -t 2
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic_bmi.rds -i data/example_data_dataset_1_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact.rds -c 1 -n 100 -r 10 -t 2
 
 ```
 
@@ -181,7 +181,7 @@ Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and p
 
 ```
 
-Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic.rds,data/example_data_dataset_2_dependent_systolic.rds -i data/example_data_dataset_1_independent.rds,example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey
+Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic_bmi.rds,data/example_data_dataset_2_dependent_systolic_bmi.rds -i data/example_data_dataset_1_independent.rds,example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey
 
 ```
 
