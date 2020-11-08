@@ -45,13 +45,21 @@ https://www.chiragjpgroup.org/voe/
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4555355/
 https://academic.oup.com/ije/advance-article/doi/10.1093/ije/dyaa164/5956264
 
-### Overview of the algorithmic approach. 
+### Overview of the algorithmic approach
 
 ![VoE pipeline](../main/images/FIG_overview.png)
 
 A) VoE takes three types of input data, all in the form of pairs of dataframes, either at the command line or in an interactive R session: 1) a single dependent variable and multiple independent variables, 2) multiple dependent variables, or 3) multiple datasets. The first column of the independent AND dependent dataframes must correspond to subject of sample IDs, and the independent dataframe must also contain a column corresponding to the primary variable of interest. In the event that the user passes multiple datasets (with a independent and dependent variable dataframe for each one), a meta-analysis will be run as part of the initial association step. 
 
-B) There are 4 main steps -- checking the input data, computing initial univariate associations, computing vibrations across possible adjusters, and quantifying how adjuster presence/absence correlates to changes in the primary association of interest. 
+B) There are 4 main steps -- checking the input data, computing initial univariate associations, computing vibrations across possible adjusters, and quantifying how adjuster presence/absence correlates to changes in the primary association of interest. Any linear model family implemented by R's glm function can be specified in addition to negative binomial models. The pipeline can also handle survey-weighted regression.
+
+The last step involves fitting the following model:
+
+```
+absolute_value(coefficient_on_primary_variable) ~ adjuster_1 + ... + adjuster_n + (1|dependent_feature) 
+```
+
+Where the y variable is the coefficient on the primary_variable for each vibration, and the adjuster_n variables correspond to the presence/absence of each adjusting variable in a given model. The random effect, which is only present if multiple dependent_features are analyzed, is present to account for variable in model effect size as a function of having multiple assocations of interest with the primary variable.
 
 ## Installation
 
@@ -126,6 +134,17 @@ Both our R terminal and command line implementations output a named list contain
 
 ## Testing
 
+Unit tests can be deployed by running, in the R terminal after loading the package:
+
+```
+devtools::test('/path/to/package/repository')
+```
+
+or at the command line:
+
+```
+R CMD check /path/to/package/binary
+```
 
 ## Example command-line deployments
 
@@ -154,11 +173,35 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 
 
 
-## Dependencies
+## Package dependencies 
 
-### Mandatory
+Depends: 
+    * R (>= 3.5.0)
+Imports:
+    * dplyr
+    * furrr
+    * future
+    * lme4
+    * broom.mixed
+    * tibble
+    * purrr
+    * tidyr
+    * magrittr
+    * MASS
+    * survey
+    * stringr
+    * stats
+    * rlang
+    * meta
+    * broom
+    * rje
+Suggests: 
+    * testthat
+    * getopt
+    * lmerTest
+    * cowplot
 
-# Licence
+# License
 
 [MIT](https://github.com/chiragjp/quantvoe/blob/main/LICENSE)
 
