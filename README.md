@@ -225,6 +225,10 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 * lmerTest
 * cowplot
 
+### Additional command line requirements (must be installed manually)
+
+* optparse
+
 # License
 
 [MIT](https://github.com/chiragjp/quantvoe/blob/main/LICENSE)
