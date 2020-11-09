@@ -197,7 +197,11 @@ The number of vibrations, number of dependent variables, number of independent v
 
 ![performance](../main/images/FIG_perf.png)
 
-### Potential issues with the confounding analysis
+### Understanding the confounding analysis   
+
+We use a regression-based approach to analyze measured confounding in VoE. Specifically, we aim to analyze how the presence -- or absence -- of different adjusting variables correlates to changes in the association between your primary variable and dependent variable(s) of interest. By default, we compute a mixed effects model across all your vibration output for your given dependent variables and primary variable. This means that if you pass multiple dependent variables, you will end up with how ALL associations change as as function of adjuster presence or absence. If you are interested in just how adjusters affect 1 dependent ~ primary variable association, you will need to rerun the analysis yourself using the R terminal (the find_confounders_linear() function on your raw vibration_data dataframe) or structure your input data such that it only has one dependent variable. Naturally, if you do only have 1 dependent variable, the program will not include a random effect.
+
+Because we are using a regression analysis to look at the impact of adjusting variables, you are subject to any of the issues that could come with mixed effect (or plain linear) regression. Pay attention to the output to look for convergence warnings. If you still have questions, feel free to contact the authors or look at the package vignette.
 
 ## Bugs
 
