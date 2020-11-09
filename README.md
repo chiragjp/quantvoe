@@ -195,7 +195,7 @@ We've found that an adjuster needs to be seen about 1000 times before you can co
 
 The number of vibrations, number of dependent variables, number of independent variables, max number of adjusters present in a given model, and multithreading can all affect runtime and results. A safe bet is to use the defaults (20 adjusters per vibration) and to batch your work (e.g. run the pipeline multiple times, once for each dependent variable). Below is a plot of runtimes and memory usage, comparing a standard linear model (using glm) vs survey-adjusted regression, for ~340 adjusters, 5000 individuals, and 20 cores:
 
-![performance](../main/images/FIG_performance.png)
+![performance](../main/images/FIG_perf.png)
 
 ### Potential issues with the confounding analysis
 
