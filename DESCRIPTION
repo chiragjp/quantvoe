@@ -35,5 +35,6 @@ Suggests:
     lmerTest,
     cowplot,
     knitr,
+    ggplot2,
     rmarkdown
 VignetteBuilder: knitr

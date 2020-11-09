@@ -12,7 +12,7 @@ analyze_voe_data(vibration_output, confounder_analysis)
 \item{confounder_analysis}{TRUE/FALSE -- run confounder analysis (default = TRUE).}
 }
 \description{
-Post-process vibration output.
+Post-process vibration output. Only works with data immediately out of the compute_vibrations function.
 }
 \keyword{analysis}
 \keyword{voe}

@@ -1,5 +1,5 @@
 ---
-title: "Running a vibration of effects analysis with quantvoe"
+title: "quantvoe_vignette1"
 author: "Braden T Tierney"
 date: "11/9/2020"
 output: rmarkdown::html_vignette
