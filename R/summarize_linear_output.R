@@ -35,6 +35,7 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters) {
 #' @keywords voe analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
+#' @export
 find_confounders_linear <- function(voe_list_for_reg){
   trylinear=FALSE
   ptype=unique(voe_list_for_reg$term)
@@ -51,16 +52,16 @@ find_confounders_linear <- function(voe_list_for_reg){
         trylinear=TRUE
       })
     }
-  }
-  if(trylinear==TRUE){
-    tryCatch({
-      fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - dependent_feature - p.value))
-      fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
-    },
-    error = function(e){
-      fit_estimate_forplot = 'Confounder analysis failed.'
-      print('Confounder analysis failed. We recommend looking at the raw vibration output to see what the issue may be.')
-    })
+    if(trylinear==TRUE){
+      tryCatch({
+        fit_estimate=stats::lm(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . - estimate - dependent_feature - p.value))
+        fit_estimate_forplot=broom::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate - .data$std.error),sdmax=(.data$estimate + .data$std.error))
+      },
+      error = function(e){
+        fit_estimate_forplot = 'Confounder analysis failed.'
+        print('Confounder analysis failed. We recommend looking at the raw vibration output to see what the issue may be.')
+      })
+    }
   }
   else{
     tryCatch({
@@ -99,7 +100,7 @@ summarize_vibration_data_by_feature <- function(df){
 
 #' Analyze VoE data
 #'
-#' Post-process vibration output.
+#' Post-process vibration output. Only works with data immediately out of the compute_vibrations function.
 #' @param vibration_output Output list from the compute vibrations function.
 #' @param confounder_analysis TRUE/FALSE -- run confounder analysis (default = TRUE).
 #' @keywords voe analysis

@@ -1,0 +1,167 @@
+---
+title: "Running a vibration of effects analysis with quantvoe"
+author: "Braden T Tierney"
+date: "11/9/2020"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running a vibration of effects analysis with quantvoe}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#load required packages
+
+library(quantvoe)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+
+theme_set(theme_cowplot())
+```
+
+In this example you will compute vibration of effects for two synthetic datasets built from NHANES (https://www.cdc.gov/nchs/nhanes/index.htm) data.
+
+
+```{r}
+#explore vignette data after loading quantvoe package
+
+print('Number of independent variables:')
+ncol(quantvoe::independent_toy_dataset1_nhanes)-1
+
+print('Number of dependent variables:')
+ncol(quantvoe::dependent_toy_dataset1_nhanes)-1
+
+print('Identity of dependent variables:')
+colnames(dependent_toy_dataset1_nhanes)[2:3]
+
+head(quantvoe::dependent_toy_dataset1_nhanes)
+head(quantvoe::independent_toy_dataset2_nhanes)[,1:10]
+head(quantvoe::dependent_toy_dataset1_nhanes)
+head(quantvoe::independent_toy_dataset2_nhanes)[,1:10]
+
+```
+
+Note that the first column of all dataframes corresponds to sample IDs, and that sample IDs do not repeat.
+
+The columns of the independent variable dataframes correspond to NHANES variable names that can be looked up on their website, where they have appropriate data dictionaries. For our purposes, we are mostly interested in BMXBMI, MYSYS, and LBXCOT, which correspond to body-mass-index, systolic blood pressure, and smoking.
+
+We're now going to explore the relationship between BMI ~ smoking and systolic_BP ~ smoking in both of our datasets with the following parameters outside of lists containing the datasets:
+
+1) meta-analysis = TRUE  -- since we have multiple datasets, we need to tell the software to run a meta-analysis across them before computing vibrations
+2) primary_variable = 'LBXCOT' -- the name of the column that corresponds to the primary independent variable, in this case smoking
+3) max_vibration_num = 1000 -- run 1000 vibrations per variable. This will avoid excessive runtimes. Note that we recommend this to be set to 10000 for actual analyses.
+4) fdr_cutoff = 1 -- don't use a significance cutoff when selecting dependent features to vibrate, just vibrate over them all. This is appropriate because we only have 2.
+5) cores = 2 -- use 2 cores for vibrations.
+6) ids, strata, weights, nest = column names in the independent dataframes specific to running a survey-weighted regression. Not needed in most cases, but NHANES requires this information to fit accurate models.
+7)  model_type  = 'survey' -- see 6). Run survey-adjusted regression.
+
+For more information on default  settings and additional parameters, see the documentation on GitHub (https://github.com/chiragjp/quantvoe).
+
+
+```{r}
+
+#deploy full pipeline -- this will likely take about 2-5 minutes on your local machine. 
+
+quantvoe_output = quantvoe::full_voe_pipeline(
+  dependent_variables=list('dataset1' = dependent_toy_dataset1_nhanes,'dataset2' = dependent_toy_dataset2_nhanes),
+  independent_variables=list('dataset1' = independent_toy_dataset1_nhanes,'dataset2' = independent_toy_dataset2_nhanes),
+  primary_variable='LBXCOT',
+  meta_analysis = TRUE,
+  fdr_cutoff = 1,
+  max_vibration_num = 500,
+  cores = 2,
+  model_type = 'survey',
+  ids = 'SDMVPSU',
+  strata = 'SDMVSTRA',
+  weights = 'WTMEC2YR',
+  nest = TRUE)
+
+
+
+#if you didn't want to run a meta-analysis, you could use the following command. It will not run in this demo because it has been commented out, and it is only here for reference.
+
+
+#quantvoe::full_voe_pipeline(
+#  dependent_variables=dependent_toy_dataset1_nhanes,
+#  independent_variables=independent_toy_dataset1_nhanes,
+#  primary_variable='LBXCOT',
+#  fdr_cutoff = 1,
+#  max_vibration_num = 1000,
+#  cores = 2,
+#  model_type = 'survey',
+#  ids = 'SDMVPSU',
+#  strata = 'SDMVSTRA',
+#  weights = 'WTMEC2YR',
+#  nest = TRUE)
+
+```
+
+Let's walk through the above output on the screen. 
+
+First, we summarize the parameters selected by the user, indicating the regression type, link  function, number of vibrations, number of models being fit, and so on. We also check that the sample ID columns are matching between the datasets and that there are no duplicate IDs or illegal column names in your data (columns that would interfere with the pipeline due to having a particular name). 
+
+We then compute the initial, univariate associations (e.g. BMI ~ Smoking), filtering out features that are too sparse (the stringency of this parameter can be tweaked, of course), and looking for and dropping any columns that have only one value in them. For example, in this case, "lite_salt" was removed. We then compute the single variate associations for each dataset, meta-analyze across the results, and compute the vibrations for each dependent feature for each dataset. In this case, we have over 300 potential adjusters, we're allowing 20 variables per vibration, and we're only fitting 1000 models. This means we likely will not see the total impact of every adjuster, as we're not sampling the dataset fully. However, for example purposes it will suffice.
+
+An alternative approach here would be to run each step in the pipeline individually. quantvoe has the ability to run its primary functions one at a time, with the output of one being the input for the next. 
+
+```{r}
+
+#explore voe output
+
+names(quantvoe_output)
+
+print(quantvoe_output[['initial_association_output']])
+
+print(quantvoe_output[['meta_analyis_output']])
+
+```
+
+The result of the pipeline is a named list of length 6 (it will be length 5 if we don't run a meta-analysis). The initial_association_output and meta_analysis_output contain the output of the univariate associations we run. As we can see, there appears to be a significant relationship between smoking and BMI, and no clear one between smoking and blood pressure, at least at this point.
+
+Now let's look at the vibration output.
+```{r}
+vibration_output = quantvoe_output[['vibration_output']]
+
+names(vibration_output)
+
+vibration_output[['summarized_vibration_output']]
+
+ggplot(data=vibration_output[['data']] %>% filter(dependent_feature=='MSYS'),aes(x=estimate,y=-log10(p.value))) + geom_hline(yintercept = -log10(.05)) + geom_point(size=.5)+ xlim(-.03, 0.03) +ylim(0,5)+ggtitle('VoE for systolic blood pressure ~ smoking')
+
+ggplot(data=vibration_output[['data']] %>% filter(dependent_feature=='BMXBMI'),aes(x=estimate,y=-log10(p.value))) + geom_hline(yintercept = -log10(.05)) + geom_point(size=.5)+ xlim(-.03, 0.03) +ylim(0,5)+ggtitle('VoE for systolic blood pressure ~ BMI')
+
+
+```
+
+Looks like we have janus effects (positive and negative associations depending on modeling strategy) in both. Not only that, it looks like you can achieve nominal statistical significance depending on model specification in both cases.
+
+To get an idea of what might be causing this, let's take a look at the confounder analysis.
+```{r}
+
+vibration_output[['confounder_analysis']] 
+
+confounder_analysis_significant = vibration_output[['confounder_analysis']] %>% filter(abs(statistic)>2.5) %>% arrange(desc(estimate)) %>% filter(term!='(Intercept)')
+
+ggplot(confounder_analysis_significant,aes(x=reorder(term,estimate),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+ggtitle('Overall confounders of BMI and blood pressure associations with smoking ')+geom_errorbar(aes(ymin =sdmin,ymax=sdmax), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=50,hjust=1))
+
+```
+
+
+The barplot above shows the top confounders of all associations. Something important to note -- we fit a mixed effect model and aggregated across all assocaitions with BMI AND blood pressure. This means that the estimates reported in the barplot are for both dependent features. If you want to look at adjusters that are impactful for just one of the features, you'll need to run the pipeline with only one dependent variable or use the raw vibration output to run your own confounder analysis. For example, you could filter quantvoe_output[['vibration_output']]$data to where term == 'MSYS' then us the find_confounders_linear() function to look specifically at adjusters that impact blood pressure ~ smoking associations.
+
+Finally, let's color the original VoE plots by some of the adjusters that were interesting to look at models with (or without) those adjusting variables.
+```{r}
+ggplot(data=vibration_output[['data']],aes(shape=as.factor(dependent_feature),color=as.factor(occupation),x=estimate,y=-log10(p.value))) + geom_hline(yintercept = -log10(.05)) + geom_point(size=1,alpha=.3,)+ xlim(-.03, 0.03) +ylim(0,5)+ggtitle('VoE for systolic blood pressure ~ smoking')
+
+
+```
+
+
+While it's hard to see because this is a very small scale analysis, the models that adjusted for occupation (equal to 1 in the legend) tend to be on the left side of zero and their absolute value overall is larger than on average.
+
+We also changed the shape of the points according to the dependent feature being observed. As we can note, while the absolute value of association size increases for both BMI and blood pressure, the raw value is negative for the former and positive for the latter.

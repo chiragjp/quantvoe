@@ -33,5 +33,7 @@ Suggests:
     testthat,
     getopt,
     lmerTest,
-    cowplot
-
+    cowplot,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
