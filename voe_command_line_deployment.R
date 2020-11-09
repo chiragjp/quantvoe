@@ -35,7 +35,7 @@ if ( !is.null(opt$help) ) {
 max_vibration_num = opt$max_vibration_num
 ### set defaults if necessary
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
-if ( is.null(opt$max_vars_in_model    ) ) { opt$max_vars_in_model    = NULL     }
+if ( is.null(opt$max_vars_in_model    ) ) { opt$max_vars_in_model    = 20     }
 if ( is.null(opt$confounder_analysis    ) ) { opt$confounder_analysis    = TRUE     }
 if ( is.null(opt$cores    ) ) { opt$cores    = 1     }
 if ( is.null(opt$vibrate    ) ) { opt$vibrate    = TRUE     }
@@ -98,6 +98,6 @@ if(exists("output")==TRUE){
   saveRDS(output,opt$output_path)
 }
 
-# q(status=0)
+ q(status=0)
 
 

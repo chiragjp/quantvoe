@@ -77,7 +77,8 @@ run_associations <- function(x,primary_variable,model_type,proportion_cutoff,vib
   tokeep = independent_variables %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(independent_variables),tokeep)
   if(length(todrop)>1){
-    print('Note: The following variables lack multiple levels and will be dropped should you run a vibration:')
+    print('Note -- The following variables lack multiple levels and will be dropped should you run a vibration:')
+    print(todrop)
     if(primary_variable %in% todrop){
       print('One of the variables being dropped is your variable of interethis will result in the pipeline failing. Please adjust your independent variables and try again.')
       quit()

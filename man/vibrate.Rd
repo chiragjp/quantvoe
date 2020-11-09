@@ -26,7 +26,7 @@ vibrate(
 
 \item{variables_to_vibrate}{Variables over which you're going to vibrate.}
 
-\item{max_vars_in_model}{Maximum number of variables allowed in a single fit in vibrations. In case an individual has many hundreds of metadata features, this prevents models from being fit with excessive numbers of variables. Setting this parameter will improve runtime for large datasets. (default=NULL)}
+\item{max_vars_in_model}{Maximum number of variables allowed in a single fit in vibrations. In case an individual has many hundreds of metadata features, this prevents models from being fit with excessive numbers of variables. Modifying this parameter will change runtime for large datasets. For example, just computing all possible models for 100 variables is extremely slow. (default = 20)}
 
 \item{feature}{Feature over which to vibrate.}
 
@@ -48,8 +48,11 @@ vibrate(
 
 \item{weights}{Name of column containing sampling weights.}
 
-\item{nest}{If TRUE, relabel cluster ids to enforce nesting within strata.#' @keywords regression, initial association}
+\item{nest}{If TRUE, relabel cluster ids to enforce nesting within strata.}
 }
 \description{
 Run vibrations for a single feature
 }
+\keyword{association}
+\keyword{initial}
+\keyword{regression,}

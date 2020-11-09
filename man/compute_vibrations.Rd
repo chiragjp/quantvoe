@@ -35,7 +35,7 @@ compute_vibrations(
 
 \item{cores}{Number of threads.}
 
-\item{max_vars_in_model}{Maximum number of variables allowed in in a model.}
+\item{max_vars_in_model}{Maximum number of variables allowed in a single fit in vibrations. In case an individual has many hundreds of metadata features, this prevents models from being fit with excessive numbers of variables. Modifying this parameter will change runtime for large datasets. For example, just computing all possible models for 100 variables is extremely slow. (default = 20)}
 
 \item{family}{GLM family (default = gaussian()). For help see help(glm) or help(family).}
 
