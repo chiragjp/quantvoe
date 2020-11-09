@@ -44,7 +44,6 @@ find_confounders_linear <- function(voe_list_for_reg){
     if(!(1 %in% unique(unlist(unname(table(voe_adjust_for_reg_ptype$dependent_feature)))))){
       tryCatch({
         fit_estimate=lme4::lmer(data=voe_adjust_for_reg_ptype,stats::as.formula(estimate ~ . +(1|dependent_feature) - dependent_feature - estimate - p.value),control = lme4::lmerControl(optimizer = "bobyqa"))
-        print(fit_estimate)
         fit_estimate_forplot=broom.mixed::tidy(fit_estimate) %>% dplyr::mutate(sdmin=(.data$estimate-.data$std.error),sdmax=(.data$estimate+.data$std.error))
         },
       error = function(e){
