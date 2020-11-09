@@ -42,7 +42,6 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
   if(passed==TRUE){
     Sys.sleep(2)
     print('Deploying initial associations')
-    saveRDS(bound_data,'temp.rds')
     association_output_full <- compute_initial_associations(bound_data, primary_variable,model_type,proportion_cutoff,vibrate, family, ids, strata, weights, nest)
     output_to_return[['initial_association_output']] = association_output_full[['output']]
     vibrate=association_output_full[['vibrate']]

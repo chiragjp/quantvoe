@@ -134,6 +134,5 @@ compute_initial_associations <- function(bound_data,primary_variable, model_type
       print('For at least one dataset, we dropped all the variables that you could possible vibrate over due to lacking multiple levels. Vibrate parameter being set to FALSE.')
     }
     output_regs = dplyr::bind_rows(output_regs)
-    saveRDS(output_regs,'foo.rds')
   return(list('output'=output_regs,'vibrate'=output_vib))
 }
