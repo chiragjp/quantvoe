@@ -187,6 +187,10 @@ Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_s
 
 Common questions or issues will be put here for easy reference.
 
+### Optimizing runtime and parameters for a given dataset
+
+### Potential issues with the confounding analysis
+
 ## Bugs
 
 Submit any issues, questions, or feature requests to the [Issue Tracker](https://github.com/chiragjp/quantvoe/issues).
