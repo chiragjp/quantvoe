@@ -9,6 +9,7 @@ regression(
   independent_variables,
   dependent_variables,
   primary_variable,
+  constant_adjusters,
   model_type,
   proportion_cutoff,
   family,
@@ -26,6 +27,8 @@ regression(
 \item{dependent_variables}{A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The columns should correspond to different variables, and the rows should correspond to different units, such as individuals (e.g. individual1, individual2, etc). If passing multiple datasets, pass a named list of the same length and in the same order as the independent_variables parameter. If running from the command line, pass the path (or comma separated paths) to .rds files containing the data, one per dataset.}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
+
+\item{constant_adjusters}{A character vector (or just one string) corresponding to column names in your dataset to include in every vibration. (default = NULL)}
 
 \item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at least weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as the family argument to this function.}
 

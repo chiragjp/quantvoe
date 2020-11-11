@@ -4,12 +4,14 @@
 \alias{analyze_voe_data}
 \title{Analyze VoE data}
 \usage{
-analyze_voe_data(vibration_output, confounder_analysis)
+analyze_voe_data(vibration_output, confounder_analysis, constant_adjusters)
 }
 \arguments{
 \item{vibration_output}{Output list from the compute vibrations function.}
 
 \item{confounder_analysis}{TRUE/FALSE -- run confounder analysis (default = TRUE).}
+
+\item{constant_adjusters}{A character vector (or just one string) corresponding to column names in your dataset to include in every vibration. (default = NULL)}
 }
 \description{
 Post-process vibration output. Only works with data immediately out of the compute_vibrations function.

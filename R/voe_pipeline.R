@@ -39,6 +39,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
     bound_data = dplyr::tibble(dependent_variables=list(dependent_variables),independent_variables=list(independent_variables),dsid=1)
   }
   output_to_return[['original_data']] = bound_data
+  constant_adjusters = unlist(unname(constant_adjusters))
   passed = pre_pipeline_data_check(dependent_variables,independent_variables,primary_variable,constant_adjusters,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type, family, ids, strata, weights, nest)
   if(passed==TRUE){
     Sys.sleep(2)
@@ -65,7 +66,7 @@ full_voe_pipeline <- function(dependent_variables,independent_variables,primary_
       vibration_output = compute_vibrations(bound_data,primary_variable,constant_adjusters,model_type,unname(unlist(features_of_interest)),max_vibration_num, proportion_cutoff,cores,max_vars_in_model,family,ids,strata, weights,nest)
       output_to_return[['vibration_variables']] = vibration_output[[2]]
       if(confounder_analysis==TRUE){
-        analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis)
+        analyzed_voe_data = analyze_voe_data(vibration_output,confounder_analysis,constant_adjusters)
         output_to_return[['vibration_output']] = analyzed_voe_data
       }
       else{

@@ -15,16 +15,18 @@ filter_unnest_feature_vib <- function(vib_df) {
 #' Add column to vibration output for each adjuster (indicating presence or absence in a model).
 #' @param voe_df Raw vibration output, the first entry in the output of compute_vibrations.
 #' @param adjusters A dataframe, each column corresponding to the adjusters used in each dataset for vibrations. This is the second entry in the compute_vibrations output. 
+#' @param constant_adjusters A character vector (or just one string) corresponding to column names in your dataset to include in every vibration. (default = NULL)
 #' @importFrom rlang .data
 #' @importFrom magrittr "%>%"
 #' @keywords voe analysis
-get_adjuster_expanded_vibrations <- function(voe_df, adjusters) {
+get_adjuster_expanded_vibrations <- function(voe_df, adjusters, constant_adjusters) {
   copy_voe_df <- rlang::duplicate(voe_df, shallow = FALSE)
   adjusters= unique(unlist(unname(purrr::map(adjusters, function(x) unlist(x)))))
   for (variable in adjusters) {
     copy_voe_df  = copy_voe_df %>% dplyr::mutate(newcol = purrr::map_int(copy_voe_df$vars, ~(variable %in% .)))
     colnames(copy_voe_df)[length(colnames(copy_voe_df))] <- variable
   }
+  copy_voe_df = copy_voe_df %>% dplyr::select(-dplyr::all_of(constant_adjusters))
   return(copy_voe_df)
 }
 
@@ -103,12 +105,13 @@ summarize_vibration_data_by_feature <- function(df){
 #' Post-process vibration output. Only works with data immediately out of the compute_vibrations function.
 #' @param vibration_output Output list from the compute vibrations function.
 #' @param confounder_analysis TRUE/FALSE -- run confounder analysis (default = TRUE).
+#' @param constant_adjusters A character vector (or just one string) corresponding to column names in your dataset to include in every vibration. (default = NULL)
 #' @keywords voe analysis
 #' @importFrom rlang .data
 #' @importFrom dplyr "%>%"
 #' @export
-analyze_voe_data <- function(vibration_output,confounder_analysis){
-  voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]])
+analyze_voe_data <- function(vibration_output,confounder_analysis,constant_adjusters){
+  voe_annotated =get_adjuster_expanded_vibrations(vibration_output[[1]], vibration_output[[2]],constant_adjusters)
   voe_unnested_annotated = filter_unnest_feature_vib(voe_annotated) %>% dplyr::select(-.data$vars)
   summarized = summarize_vibration_data_by_feature(voe_unnested_annotated)
   c_analysis='No confounder analysis completed.'

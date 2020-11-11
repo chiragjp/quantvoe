@@ -7,6 +7,7 @@
 dataset_vibration(
   subframe,
   primary_variable,
+  constant_adjusters,
   model_type,
   features_of_interest,
   max_vibration_num,
@@ -24,6 +25,8 @@ dataset_vibration(
 \item{subframe}{List of length 2. Dataframes containing a single datasets independent and dependent data.}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
+
+\item{constant_adjusters}{A character vector (or just one string) of column names corresponding to column names in your dataset to include in every vibration. (default = NULL)}
 
 \item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at leaset weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as an additional argument to this function.}
 

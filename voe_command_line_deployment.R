@@ -7,7 +7,7 @@ spec = matrix(c(
   'dependent_variables', 'd', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'independent_variables', 'i', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
-  'constant_adjusters', 'j' ,'Comma separate list (without spaces) of corresponding to column names in your dataset to include in every vibration. (default = NULL)'
+  'constant_adjusters', 'j',1 ,"character",'Comma separate list (without spaces) of corresponding to column names in your dataset to include in every vibration. (default = NULL)',
   'output_path', 'o', 2, "character","Output rds name",
   'family', 'p', 1, "character","GLM family. (default: gaussian)",
   'model_type', 'u', 1, "character","Specifies regression type -- 'glm', 'survey', or 'negative_binomial'.",
@@ -91,8 +91,8 @@ if(length(unlist(independent_variable_locs))==1){
   colnames(independent_variables)[1]='sampleID'
 }
 
-if(opt$constant_adjusters!=NULL){
-  opt$constant_adjusters = strsplit(as.character(opt$constant_adjusters),',')
+if(!is.null(opt$constant_adjusters)){
+  opt$constant_adjusters = unlist(unname(strsplit(as.character(opt$constant_adjusters),',')))
 }
 
 message('Data parsed and loaded, running pipeline.')

@@ -7,6 +7,7 @@
 run_associations(
   x,
   primary_variable,
+  constant_adjusters,
   model_type,
   proportion_cutoff,
   vibrate,
@@ -21,6 +22,8 @@ run_associations(
 \item{x}{merged independent an dependent data for a given dataset}
 
 \item{primary_variable}{The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."}
+
+\item{constant_adjusters}{A character vector (or just one string) of column names corresponding to column names in your dataset to include in every vibration. (default = NULL)}
 
 \item{model_type}{Specifies regression type -- "glm", "survey", or "negative_binomial". Survey regression will require additional parameters (at least weight, nest, strata, and ids). Any model family (e.g. gaussian()), or any other parameter can be passed as the family argument to this function.}
 
