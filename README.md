@@ -237,6 +237,7 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 ### Suggests: 
 * testthat
 * getopt
+* ggplot2
 * lmerTest
 * cowplot
 
