@@ -174,7 +174,7 @@ Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_s
 
 ### Meta-analytic madman
 
-Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting: 100 vibrations per dependent variable, 4 cores, max of 20 variables per model, FDR cutoff of 1 (vibrate over all initial association output).
+Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting: 100 vibrations per dependent variable, 4 cores, max of 10 variables per model, FDR cutoff of 1 (vibrate over all initial association output).
 
 
 ```
