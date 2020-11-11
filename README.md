@@ -73,6 +73,8 @@ R CMD build /path/to/quantvoe/repository/
 R CMD install quantvoe_0.1.0.tar.gz
 ```
 
+You can alternatively download the [mosts recent release](https://github.com/chiragjp/quantvoe/releases) tarball and install it locally with R CMD install or devtools.
+
 We are in the process of submitting to CRAN, and expect it to be accessible 
 through `install.packages('quantvoe')` shortly.
 
