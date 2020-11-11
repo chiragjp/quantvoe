@@ -7,6 +7,7 @@ spec = matrix(c(
   'dependent_variables', 'd', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'independent_variables', 'i', 2, "character","Path to dependent variable matrix, stored as .rds file. If running meta-analysis, provide comma separated list of paths without spaces (or commas) in either paths or filenames.",
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
+  'constant_adjusters', 'j' ,'Comma separate list (without spaces) of corresponding to column names in your dataset to include in every vibration. (default = NULL)'
   'output_path', 'o', 2, "character","Output rds name",
   'family', 'p', 1, "character","GLM family. (default: gaussian)",
   'model_type', 'u', 1, "character","Specifies regression type -- 'glm', 'survey', or 'negative_binomial'.",
@@ -37,6 +38,7 @@ max_vibration_num = opt$max_vibration_num
 if ( is.null(opt$fdr_method    ) ) { opt$fdr_method    = 'BY'     }
 if ( is.null(opt$max_vars_in_model    ) ) { opt$max_vars_in_model    = 20     }
 if ( is.null(opt$confounder_analysis    ) ) { opt$confounder_analysis    = TRUE     }
+if ( is.null(opt$constant_adjusters    ) ) { opt$constant_adjusters    = NULL     }
 if ( is.null(opt$cores    ) ) { opt$cores    = 1     }
 if ( is.null(opt$vibrate    ) ) { opt$vibrate    = TRUE     }
 if ( is.null(opt$fdr_cutoff      ) ) { opt$fdr_cutoff      = 0.05     }
@@ -89,9 +91,13 @@ if(length(unlist(independent_variable_locs))==1){
   colnames(independent_variables)[1]='sampleID'
 }
 
+if(opt$constant_adjusters!=NULL){
+  opt$constant_adjusters = strsplit(as.character(opt$constant_adjusters),',')
+}
+
 message('Data parsed and loaded, running pipeline.')
 
-output = quantvoe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,fdr_method=opt$fdr_method,confounder_analysis=opt$confounder_analysis,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, max_vars_in_model = opt$max_vars_in_model, model_type=opt$model_type,cores=opt$cores,family = opt$family, ids = opt$ids, strata = opt$strata, weights = opt$weights, nest = opt$nest,vibrate = opt$vibrate)
+output = quantvoe::full_voe_pipeline(dependent_variables=dependent_variables,independent_variables=independent_variables,primary_variable=opt$primary_variable,constant_adjusters=opt$constant_adjusters,fdr_method=opt$fdr_method,confounder_analysis=opt$confounder_analysis,fdr_cutoff=opt$fdr_cutoff,max_vibration_num=opt$max_vibration_num,proportion_cutoff=opt$proportion_cutoff,meta_analysis=opt$meta_analysis, max_vars_in_model = opt$max_vars_in_model, model_type=opt$model_type,cores=opt$cores,family = opt$family, ids = opt$ids, strata = opt$strata, weights = opt$weights, nest = opt$nest,vibrate = opt$vibrate)
 
 if(exists("output")==TRUE){
   message('Writing output to file...')

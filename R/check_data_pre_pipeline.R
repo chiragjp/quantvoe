@@ -5,6 +5,7 @@
 #' @param dependent_variables A tibble containing the information for your dependent variables (e.g. bacteria relative abundance, age). The columns should correspond to different variables, and the rows should correspond to different units, such as individuals (e.g. individual1, individual2, etc). If passing multiple datasets, pass a named list of the same length and in the same order as the independent_variables parameter. If running from the command line, pass the path (or comma separated paths) to .rds files containing the data, one per dataset.
 #' @param independent_variables A tibble containing the information for your independent variables (e.g. bacteria relative abundance, age). The columns should correspond to different variables, and the rows should correspond to different units,  (e.g. individual1, individual2, etc). If passing multiple datasets, pass a named list of the same length and in the same order as the dependent_variables parameter. If running from the command line, pass the path (or comma separated paths) to .rds files containing the data, one per dataset.
 #' @param primary_variable The column name from the independent_variables tibble containing the key variable you want to associate with disease in your first round of modeling (prior to vibration). For example, if you are interested fundamentally identifying how well age can predict height, you would make this value a string referring to whatever column in said dataframe refers to "age."
+#' @param constant_adjusters A character vector (or just one string) corresponding to column names in your dataset to include in every vibration. (default = NULL)
 #' @param max_vars_in_model Maximum number of variables allowed in a single fit in vibrations. In case an individual has many hundreds of metadata features, this prevents models from being fit with excessive numbers of variables. Modifying this parameter will change runtime for large datasets. For example, just computing all possible models for 100 variables is extremely slow. (default = 20)
 #' @param fdr_method Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni. Adjustment is computed for all initial, single variable, associations across all dependent features. 
 #' @param fdr_cutoff Cutoff for an FDR significant association. All features with adjusted p-values initially under this value will be selected for vibrations. (default = 0.05). Setting a stringent FDR cutoff is mostly relevant when you are using a large number of dependent variables (eg >50) and want to filter those with weak initial associations.
@@ -19,7 +20,7 @@
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @keywords pipeline
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,family,ids,strata,weights,nest){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,constant_adjusters,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,family,ids,strata,weights,nest){
   print('Checking input data...')
   if(model_type=='survey'){
     print('Running a survey weighted regression, using the following passed parameters for the design:')
@@ -30,6 +31,9 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
   }
   if(meta_analysis==TRUE){
     print(paste('Primary variable of interest: ',primary_variable,sep=''))
+    if(!is.null(constant_adjusters)){
+      print(paste('Adjusters to include in every vibration: ',constant_adjusters,sep=''))
+    }
     print(paste('FDR method: ',fdr_method,sep=''))
     print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     print(paste('Max number of vibrations (if vibrate=TRUE): ',as.character(max_vibration_num),sep=''))
@@ -71,6 +75,9 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     print(paste('Model type: ',model_type,sep=''))
     print(paste('Family: ',family[[1]],sep=''))
     print(paste('Primary variable of interest: ',primary_variable,sep=''))
+    if(!is.null(constant_adjusters)){
+      print(paste('Adjusters to include in every vibration: ',constant_adjusters,sep=''))
+    }    
     print(paste('FDR method: ',fdr_method,sep=''))
     print(paste('FDR cutoff: ',as.character(fdr_cutoff),sep=''))
     print(paste('Only keeping features that are at least',proportion_cutoff*100,'percent nonzero.'))
@@ -91,12 +98,12 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
       quit()
     }
   print('Checking for illegal variable names...')
-  illegal_names = c('dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
+  illegal_names = c('','dependent_variables','independent_variables','feature','max_vibration_num','fdr_method','fdr_cutoff','primary_variable','independent_feature')
   allnames=c(colnames(dependent_variables),colnames(independent_variables))
   to_change = intersect(illegal_names,allnames)
   }
   if(length(to_change)>0){
-    print('Illegal variable names that may disrupt pipeline have been identified. Please adjust the following column names in your input data.')
+    print('Illegal variable names that may disrupt pipeline have been identified. Please adjust the following column names in your input data. Note that all columns must have a name (e.g. not "").')
     print(to_change)
     return(FALSE)
   }
