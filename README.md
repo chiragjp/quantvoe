@@ -2,7 +2,7 @@
 
 ## Introduction
 
-When computing any association between an X and an Y variable -- like coffee and heart attacks, 
+When computing any association between an X and a Y variable -- like coffee and heart attacks, 
 wine and mortality, or weight and type 2 diabetes onset, different modeling strategies can 
 often yield different or even conflicting results. We refer to this as "vibration of effects," 
 and it permeates any field that uses observational data (which is most fields). Modeling vibration 
