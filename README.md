@@ -59,13 +59,8 @@ Where the y variable is the coefficient on the primary_variable for each vibrati
 
 ## Installation
 
-To install the most recent development version, install and use R's devtools package:
 ```
-#if devtools is not already installed, do so with install.packages()
-install.packages('devtools')
-devtools::install_github("chiragjp/quantvoe")
-```
-To build from source:
+We recommend building from the Git repo so you can easily access and use the command-line script (voe_command_line_deployment.R) in the root directory. Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")` at the R terminal.
 
 ```
 git clone https://github.com/chiragjp/quantvoe.git
@@ -73,12 +68,18 @@ R CMD build /path/to/quantvoe/repository/
 R CMD install quantvoe_0.1.0.tar.gz
 ```
 
+To install the most recent development version without cloning, use R's devtools package:
+```
+#if devtools is not already installed, do so with install.packages() from the R terminal
+install.packages('devtools')
+devtools::install_github("chiragjp/quantvoe")
+```
+
 You can alternatively download the [mosts recent release](https://github.com/chiragjp/quantvoe/releases) tarball and install it locally with R CMD install or devtools.
 
 We are in the process of submitting to CRAN, and expect it to be accessible 
 through `install.packages('quantvoe')` shortly.
 
-Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")`.
 
 ## Usage 
 
