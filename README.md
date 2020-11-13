@@ -59,7 +59,6 @@ Where the y variable is the coefficient on the primary_variable for each vibrati
 
 ## Installation
 
-```
 We recommend building from the Git repo so you can easily access and use the command-line script (voe_command_line_deployment.R) in the root directory. Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")` at the R terminal.
 
 ```
