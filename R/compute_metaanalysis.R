@@ -90,7 +90,8 @@ get_summary_stats <- function(input_meta_df,dataset_num) {
       BH = stats::p.adjust(.data$p.val, method = "fdr"),
       BY = stats::p.adjust(.data$p.val, method = "BY"),
       CI_95_lower = purrr::map_dbl(meta_df, ~.[[1]]$lower.random),
-      CI_95_upper = purrr::map_dbl(meta_df, ~.[[1]]$upper.random)
+      CI_95_upper = purrr::map_dbl(meta_df, ~.[[1]]$upper.random),
+      full_ma_output = purrr::map(meta_df, ~.)
     )
   )
 }

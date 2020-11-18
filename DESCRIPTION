@@ -1,7 +1,7 @@
 Package: quantvoe
 Type: Package
 Title: Modeling vibrational effects in observational data
-Version: 0.2.0
+Version: 0.1.0
 Author: Braden Tierney [aut], Elizabeth Anderson [aut], Yingxuan Tan [aut]
 Maintainer: Braden Tierney <btierney@g.harvard.edu>
 Description:  
