@@ -2,7 +2,7 @@
 
 ## Introduction
 
-When computing any association between an X and an Y variable -- like coffee and heart attacks, 
+When computing any association between an X and a Y variable -- like coffee and heart attacks, 
 wine and mortality, or weight and type 2 diabetes onset, different modeling strategies can 
 often yield different or even conflicting results. We refer to this as "vibration of effects," 
 and it permeates any field that uses observational data (which is most fields). Modeling vibration 
@@ -59,13 +59,7 @@ Where the y variable is the coefficient on the primary_variable for each vibrati
 
 ## Installation
 
-To install the most recent development version, install and use R's devtools package:
-```
-#if devtools is not already installed, do so with install.packages()
-install.packages('devtools')
-devtools::install_github("chiragjp/quantvoe")
-```
-To build from source:
+We recommend building from the Git repo so you can easily access and use the command-line script (voe_command_line_deployment.R) in the root directory. Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")` at the R terminal.
 
 ```
 git clone https://github.com/chiragjp/quantvoe.git
@@ -73,10 +67,18 @@ R CMD build /path/to/quantvoe/repository/
 R CMD install quantvoe_0.1.0.tar.gz
 ```
 
+To install the most recent development version without cloning, use R's devtools package:
+```
+#if devtools is not already installed, do so with install.packages() from the R terminal
+install.packages('devtools')
+devtools::install_github("chiragjp/quantvoe")
+```
+
+You can alternatively download the [mosts recent release](https://github.com/chiragjp/quantvoe/releases) tarball and install it locally with R CMD install or devtools.
+
 We are in the process of submitting to CRAN, and expect it to be accessible 
 through `install.packages('quantvoe')` shortly.
 
-Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")`.
 
 ## Usage 
 
@@ -97,6 +99,7 @@ Rscript voe_command_line_deployment.R -h
 | dependent_variables   |  -d  | The path to a tibble (saved as an rds)  containing the information for your   dependent variables (e.g. bacteria relative abundance, age). The columns   should correspond to different variables, and the rows should correspond to   different units, such as individuals (e.g. individual1, individual2, etc). If   inputting multiple datasets in order to run a meta-an analyais, pass a comma   separated list of paths to the location of your saved tibbles (one per   dataset). Be sure to not include spaces in the list or commas in the   paths/filenames themselves.  | Yes       |
 | independent_variables |  -i  | The path to a tibble (saved as an rds) containing the information   for your independent variables (e.g. bacteria relative abundance, age). The   columns should correspond to different variables, and the rows should   correspond to different units,  (e.g. individual1, individual2, etc). If   inputting multiple datasets in order to run a meta-an analyais, pass a comma   separated list of paths to the location of your saved tibbles (one per   dataset). Be sure to not include spaces in the list or commas in the paths/filenames   themselves.                    | Yes       |
 | primary_variable      |  -v  | The primary independent variable of interest.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Yes       |
+| constant_adjusters    |  -j  | Comma-separated (no spaces) list of adjusters to include in every model. Should correspond to column names in your independent data (Default = NULL)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No       |
 | output                |  -o  | Path to and name of output .rds file (e.g. ./output.rds) .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Yes       |
 | fdr_method            |  -m  | Your choice of method for adjusting p-values. Options are BY   (default), BH, or bonferroni. Adjustment is computed for all initial, single   variable, associations across all dependent features.                                                                                                                                                                                                                                                                                                                                                                                | No        |
 | fdr_cutoff            |  -c  | Cutoff for an FDR significant association. All features with   adjusted p-values initially under this value will be selected for vibrations.   (default = 0.05). Setting a stringent FDR cutoff is mostly relevant when you   are using a large number of dependent variables (eg >50) and want to   filter those with weak initial associations.                                                                                                                                                                                                                                  | No        |
@@ -236,6 +239,7 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 ### Suggests: 
 * testthat
 * getopt
+* ggplot2
 * lmerTest
 * cowplot
 
