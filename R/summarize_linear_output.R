@@ -51,7 +51,7 @@ find_confounders_linear <- function(voe_list_for_reg){
         },
       error = function(e){
         print('Note: Mixed effect modeling to identify sources of confounding failed. Running a simple linear model instead. If you want to try this analysis yourself, you can access the raw data for this yourself in the output and follow the methodological layout in the docs.')
-        trylinear=TRUE
+        trylinear <<- TRUE
       })
     }
     if(trylinear==TRUE){
