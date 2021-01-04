@@ -9,7 +9,7 @@ spec = matrix(c(
   'primary_variable', 'v', 2, "character","Primary independent variable of interest.",
   'constant_adjusters', 'j',1 ,"character",'Comma separate list (without spaces) of corresponding to column names in your dataset to include in every vibration. (default = NULL)',
   'output_path', 'o', 2, "character","Output rds name",
-  'family', 'p', 1, "character","GLM family. (default: gaussian)",
+  'family', 'l', 1, "character","GLM family. (default: gaussian)",
   'model_type', 'u', 1, "character","Specifies regression type -- 'glm', 'survey', or 'negative_binomial'.",
   'vibrate', 'b', 1, "logical","TRUE/FALSE -- Run vibrations (default: TRUE)",
   'fdr_method', 'm', 1, "character","Multiple hypothesis testing method (BY, BH, bonferroni, default = BY)",

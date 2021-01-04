@@ -94,8 +94,6 @@ write.csv(num_obs_pe_var,'figures/num_obs_per_var.csv')
 
 ```{r}
 #volcano plots
-load('nhanes9904_VoE.Rdata')
-
 get_confounders <- function(vibration_data,dictionary,name,indfeat){
   #regout  = cv.glmnet(y=vibration_data_i %>% select(estimate) %>% as.matrix, x=vibration_data_i %>% select(-estimate) %>% as.matrix, alpha=1 ,type.measure = "mse", nfolds = 10)
   vibration_data_for_reg = vibration_data %>% select(-c(std.error,p.value,statistic,independent_feature,dependent_feature)) %>% mutate(estimate=(estimate))
@@ -104,7 +102,7 @@ get_confounders <- function(vibration_data,dictionary,name,indfeat){
  # regout = regout %>% filter(term!='(Intercept)',effect=='fixed') %>% select(-group,-effect)
   regout = regout %>% filter(term!='(Intercept)')
 # coefficients = as.data.frame(as.matrix(coef(regout))) %>% rownames_to_column('term') %>% arrange(1)
-  coefficients = left_join(regout,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description)) %>% select(variable_description,term,estimate,std.error)  %>% distinct()
+  coefficients = left_join(regout,dictionary %>% select(Variable.Name,Variable.Description) %>% distinct,by=c('term'='Variable.Name')) %>% filter(!is.na(Variable.Description)) %>% select(Variable.Description,term,estimate,std.error)  %>% distinct()
  # bot_confounder_analysis = coefficients %>% arrange(estimate) %>% distinct %>% head(25)
   tbca = coefficients %>% arrange(desc(estimate)) %>% distinct
   #tbca = bind_rows(tbca,bot_confounder_analysis)
@@ -113,17 +111,17 @@ get_confounders <- function(vibration_data,dictionary,name,indfeat){
   return(tbca)
 }
 
-setwd('~/GitHub/quantvoe/manuscript')
+setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
 
-files=list.files()[grep('_output_',list.files())]
-files=files[grep('10000_',files)]
+dictionary = read.csv('dataDictionary_NHANES.csv')
 
+files=list.files()[grep('output',list.files())]
 all_vibration_data=list() 
 summary_data=list()
 for(f in files){
     data=readRDS(f)
     vibration_output=data$vibration_output
-    summary_data[[f]] = vibration_output$summarized_vibration_output %>% mutate(dep_feature = strsplit(f,'.rds') %>% map_chr(1) %>% strsplit('10000_') %>% map_chr(2))
+    summary_data[[f]] = vibration_output$summarized_vibration_output %>% mutate(independent_feature = paste(data$initial_association_output[['term']],collapse='__'))
     all_vibration_data[[f]]=vibration_output
 }
 
@@ -149,6 +147,9 @@ for(name in dfs){
       next
     }
     vibration_data2 = vibration_data %>% filter(term==i) %>% select(-term)
+    if(nrow(vibration_data2)==0){
+      next
+    }
   conf_analysis_temp = get_confounders(vibration_data2,dictionary,name,i)
   conf_analysis[[paste(i,name)]]=conf_analysis_temp
     max_x_val = max(abs(full_output %>% filter(term==i) %>% select(estimate) %>% range))+.001
@@ -160,7 +161,7 @@ for(name in dfs){
       max_y_val=18
     }
     ggplot(data = vibration_data2, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
-    ggsave(paste('figures/',name,'_',i,'.pdf',sep=''),width=3,height=3)
+    ggsave(paste('../figures/',name,'_',i,'.pdf',sep=''),width=3,height=3)
   }
 }
 
@@ -205,96 +206,4 @@ ggplot(conf_analysis_sub,aes(x=reorder(variable_description,desc(estimate)),y=es
 
   }
 }
-```
-
-```{r}
-load('nhanes9904_VoE.Rdata')
-
-library(pre)
-
-conf_analysis_sub  = conf_analysis %>% filter(dep_feature == 'LBXTC', ind_feature == 'LBXCOT') %>% arrange(desc(estimate))%>% head(10) %>% select(term) %>% unlist %>% unname %>% as.character()
-
-conf_analysis_sub2  = conf_analysis %>% filter(dep_feature == 'LBXTC', ind_feature == 'LBXCOT') %>% arrange(desc(estimate))%>% head(10) %>% select(variable_description) %>% unlist %>% unname %>% as.character()
-
-
-forpre = mainTab %>% select(LBXTC,LBXCOT,conf_analysis_sub,WTMEC2YR)
-
-preout = pre(data=forpre,formula=LBXTC ~ . - WTMEC2YR,weights=forpre$WTMEC2YR)
-
-
-
-```
-
-
-```{r}
-#volcano plots for non survey data
-load('nhanes9904_VoE.Rdata')
-
-get_confounders <- function(vibration_data,dictionary,name,indfeat){
-  #regout  = cv.glmnet(y=vibration_data_i %>% select(estimate) %>% as.matrix, x=vibration_data_i %>% select(-estimate) %>% as.matrix, alpha=1 ,type.measure = "mse", nfolds = 10)
-  vibration_data_for_reg = vibration_data %>% select(-c(std.error,p.value,statistic,independent_feature,dependent_feature)) %>% mutate(estimate=(estimate))
-  #regout = broom.mixed::tidy(lmer(estimate ~ . -term + (1|term),data=vibration_data_for_reg))
-  regout = broom::tidy(lm(abs(estimate) ~ .,data=vibration_data_for_reg))
- # regout = regout %>% filter(term!='(Intercept)',effect=='fixed') %>% select(-group,-effect)
-  regout = regout %>% filter(term!='(Intercept)')
-# coefficients = as.data.frame(as.matrix(coef(regout))) %>% rownames_to_column('term') %>% arrange(1)
-  coefficients = left_join(regout,dictionary %>% select(varname,variable_description),by=c('term'='varname')) %>% filter(!is.na(variable_description)) %>% select(variable_description,term,estimate,std.error)  %>% distinct()
- # bot_confounder_analysis = coefficients %>% arrange(estimate) %>% distinct %>% head(25)
-  tbca = coefficients %>% arrange(desc(estimate)) %>% distinct
-  #tbca = bind_rows(tbca,bot_confounder_analysis)
-  tbca$dep_feature=name
-  tbca$ind_feature=indfeat
-  return(tbca)
-}
-
-setwd('~/GitHub/quantvoe/manuscript')
-
-files=list.files()[grep('_outputnon',list.files())]
-files=files[grep('10000_',files)]
-
-all_vibration_data=list() 
-summary_data=list()
-for(f in files){
-    data=readRDS(f)
-    vibration_output=data$vibration_output
-    summary_data[[f]] = vibration_output$summarized_vibration_output %>% mutate(dep_feature = strsplit(f,'.rds') %>% map_chr(1) %>% strsplit('10000_') %>% map_chr(2))
-    all_vibration_data[[f]]=vibration_output
-}
-
-summary_data = bind_rows(summary_data)
-write.csv(summary_data,'~/GitHub/quantvoe/manuscript/figures_nonsurvey/voe_summary_data.csv')
-
-full_output = bind_rows(purrr::map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
-full_output$term = factor(full_output$term)
-full_output = full_output %>% filter(!is.na(p.value)) %>% select_if(~ length(unique(.)) > 1) %>% select(-full_fits)
-
-dfs = unique(full_output$dependent_feature)
-
-conf_analysis=list()
-for(name in dfs){
-  indvars = unique(full_output$term)
-  vibration_data = full_output %>% filter(dependent_feature==name) 
-  if(name=='BMXBMI'){
-    vibration_data = vibration_data %>% select(-BMXBMI)
-  }
-  vibration_data=vibration_data[ , colSums(is.na(vibration_data)) == 0]
-  for(i in indvars){
-    max_x_val = max(abs(full_output %>% filter(term==i) %>% select(estimate) %>% range))+.001
-    max_y_val = unlist(unname(-log10(quantile(full_output %>% filter(term==i) %>% filter(p.value!=0) %>% select(p.value) %>% unlist %>% unname,.01))))+.01*-log10(min(full_output%>% filter(p.value!=0)  %>% filter(term==i) %>% select(p.value)))
-    if(max_y_val<=-log10(0.05)){
-      max_y_val=1.5
-    }
-    if(i=='BMXBMI'){
-      max_y_val=18
-    }
-    vibration_data2 = vibration_data %>% filter(term==i) %>% select(-term)
-  conf_analysis_temp = get_confounders(vibration_data2,dictionary,name,i)
-  conf_analysis[[paste(i,name)]]=conf_analysis_temp
-    ggplot(data = vibration_data2, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
-    ggsave(paste('figures_nonsurvey/',name,'_',i,'.pdf',sep=''),width=3,height=3)
-  }
-}
-
-
-
 ```
