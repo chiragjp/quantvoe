@@ -27,33 +27,32 @@ theme_set(theme_cowplot())
 #benchmarking
 setwd('~/GitHub/quantvoe/manuscript/')
 
-benchmarkdata = read.csv('jobtimedata.csv',header=F,sep=',') %>% filter(V1!=100)
-benchmarkdata$elapsed_time = as.numeric(gsub('S','',lubridate::seconds(hms(benchmarkdata$V2))))
-benchmarkdata$jobsize = as.numeric(gsub('K','',benchmarkdata$V3))/1000000
+benchmarkdata = read.csv('jobtimedata.csv',header=F,sep=',') %>% select(V1,V2,V3) %>% rename(jobsize=V2,elapsed_time=V3)
+benchmarkdata$elapsed_time = as.numeric(gsub('S','',lubridate::seconds(hms(benchmarkdata$elapsed_time))))
+benchmarkdata$jobsize = as.numeric(gsub('G','',benchmarkdata$jobsize))
 
-benchmarkdata = benchmarkdata %>% select(V1,V5,elapsed_time,jobsize,V6)
-colnames(benchmarkdata)=c('Number of vibrations','Independent variable','elapsed_time','jobsize','Model Type')
+colnames(benchmarkdata)=c('Number of vibrations','jobsize','elapsed_time')
 
-ggplot(data=benchmarkdata,aes(x=log(`Number of vibrations`),y=log(elapsed_time),color=`Independent variable`)) + geom_point(aes(shape=`Model Type`)) + ggtitle('Runtime benchmarking') + xlab('log(Number of vibrations)') + ylab('Log(Seconds)')
+ggplot(data=benchmarkdata,aes(x=log(`Number of vibrations`),y=(elapsed_time))) + geom_point() + ggtitle('Runtime benchmarking') + xlab('log(Number of vibrations)') + ylab('Log(Seconds)')
 ggsave('figures/jobtimes_multicore.pdf',width=7,height=5)
 
-ggplot(data=benchmarkdata,aes(x=log(`Number of vibrations`),y=log(jobsize),color=`Independent variable`)) + geom_point(aes(shape=`Model Type`)) + ggtitle('Memory usage')+ xlab('log(Number of vibrations)') + ylab('Log(RAM used, GB)')
+ggplot(data=benchmarkdata,aes(x=log(`Number of vibrations`),y=(jobsize))) + geom_point() + ggtitle('Memory usage')+ xlab('log(Number of vibrations)') + ylab('Log(RAM used, GB)')
 ggsave('figures/memusage.pdf',width=7,height=5)
 
+#sumbench=benchmarkdata %>% group_by(`Number of vibrations`) %>% select(elapsed_time,jobsize) %>% summarise(runtime_mean=mean(elapsed_time),runtime_sd=sd(elapsed_time),memusage_mean=mean(jobsize),memusage_sd=sd(jobsize))
 
-sumbench=benchmarkdata %>% group_by(`Model Type`,`Number of vibrations`) %>% select(elapsed_time,jobsize) %>% summarise(runtime_mean=mean(elapsed_time),runtime_sd=sd(elapsed_time),memusage_mean=mean(jobsize),memusage_sd=sd(jobsize))
-
-write.csv(sumbench,'~/GitHub/quantvoe/manuscript/figures/summarized_benchmark_data.csv')
+#write.csv(sumbench,'~/GitHub/quantvoe/manuscript/figures/summarized_benchmark_data.csv')
 ```
 
 
 ```{r}
 #confounder benchmark
-setwd('~/GitHub/quantvoe/manuscript/')
+setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
 
-phenotypes = unique(benchmarkdata$`Independent variable`)
+phenotypes = 'DR1TTFAT'
 
-files=list.files()[grep('_output_',list.files())]
+files=list.files()[grep('benchmarking',list.files())]
+files=files[grep('rds',files)]
 
 breaksList = seq(.85, 1.0, by = .01)
 cols=colorRampPalette(c("red","yellow","royalblue"))
@@ -66,7 +65,7 @@ for(p in phenotypes){
   for(f in files_sub){
     print(f)
     data = readRDS(f)
-    name = strsplit(f,'_')[[1]][4]
+    name = strsplit(strsplit(f,'_')[[1]][5],'\\.')[[1]][1]
     if(grepl('_1.rds',f)==TRUE){
       next
     }
@@ -78,31 +77,46 @@ for(p in phenotypes){
     confounder_presence_data[[f]]=c(totalobs[!is.na(totalobs)])
   }
   confounder_analysis_list = confounder_analysis_list %>% reduce(inner_join, by = "term") %>% select(-term)
-  confounder_analysis_list = confounder_analysis_list[, c(5,1,6,2,7,3)]
-  confounder_analysis_list = cor(confounder_analysis_list)
-  write.csv(confounder_analysis_list,paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'.csv',sep=''))
-  pdf(paste('figures/corplot_',strsplit(f,'.rds')[[1]][[1]],'-.pdf',sep=''),width=3,height=3)
+  confounder_analysis_list = confounder_analysis_list[, c(1,5,8,2,6,9,11,3,7,10,12,4)]
+  confounder_analysis_list = cor(confounder_analysis_list,use='complete.obs')
+  write.csv(confounder_analysis_list,paste('../figures/benchmarking_corplot_data.csv',sep=''))
+  pdf(paste('../figures/benchmarking_corplot_data.pdf',sep=''),width=5,height=5)
   pheatmap(confounder_analysis_list,cluster_rows=FALSE,cluster_cols=FALSE,breaks=breaksList,legend = FALSE,color=cols(14))
   dev.off()
 }
 
-num_obs_pe_var = do.call('rbind',confounder_presence_data)  %>% melt %>% mutate(num=strsplit(as.character(Var1),'_') %>% map_chr(4)) %>% select(-Var1,-Var2) %>% group_by(num) %>% summarize(mean=mean(value),sd=sd(value))
-write.csv(num_obs_pe_var,'figures/num_obs_per_var.csv')
+num_obs_pe_var = do.call('rbind',confounder_presence_data)  %>% melt %>% mutate(num=strsplit(as.character(Var1),'_') %>% map_chr(5) %>% strsplit('\\.') %>% map_chr(1)) %>% select(-Var1,-Var2) %>% group_by(num) %>% summarize(mean=mean(value),sd=sd(value)) %>% mutate(num=as.numeric(num)) %>% arrange(num)
+write.csv(num_obs_pe_var,'../figures/num_obs_per_var.csv')
 
 ```
 
 
 ```{r}
 #volcano plots
+
+summarize_vibration_data_by_feature <- function(df){
+  p <- c(0.01,.5,.99)
+  p_names <- purrr::map_chr(p, ~paste0('estimate_quantile_',.x*100, "%"))
+  p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)
+  model_counts = df %>% dplyr::count(.data$dependent_feature) %>% dplyr::rename(number_of_models=.data$n)
+  df_estimates = suppressMessages(df %>% dplyr::group_by(.data$dependent_feature) %>% dplyr::summarize_at(dplyr::vars(.data$estimate), tibble::lst(!!!p_funs)) %>% dplyr::mutate(estimate_diff_99_1 = .data$`estimate_quantile_99%`-.data$`estimate_quantile_1%`,janus_effect=df %>% dplyr::group_by(.data$dependent_feature) %>% dplyr::summarise(janus_effect = sum(.data$estimate > 0, na.rm = TRUE)/sum(is.finite(.data$estimate), na.rm = TRUE)) %>% dplyr::ungroup() %>% dplyr::select(.data$janus_effect) %>% unname %>% unlist))
+  p_names <- purrr::map_chr(p, ~paste0('pval_quantile_',.x*100, "%"))
+  p_funs <- purrr::map(p, ~purrr::partial(quantile, probs = .x, na.rm = TRUE)) %>% purrr::set_names(nm = p_names)
+  df_pval = df %>% dplyr::group_by(.data$dependent_feature) %>% dplyr::summarize_at(dplyr::vars(.data$p.value), tibble::lst(!!!p_funs)) %>% dplyr::mutate(pvalue_diff_99_1 = .data$`pval_quantile_99%`-.data$`pval_quantile_1%`)
+  summarized_voe_data=dplyr::bind_cols(model_counts, df_estimates %>% dplyr::select(-.data$dependent_feature),df_pval %>% dplyr::select(-.data$dependent_feature))
+  return(summarized_voe_data)
+}
+
+
 get_confounders <- function(vibration_data,dictionary,name,indfeat){
   #regout  = cv.glmnet(y=vibration_data_i %>% select(estimate) %>% as.matrix, x=vibration_data_i %>% select(-estimate) %>% as.matrix, alpha=1 ,type.measure = "mse", nfolds = 10)
-  vibration_data_for_reg = vibration_data %>% select(-c(std.error,p.value,statistic,independent_feature,dependent_feature)) %>% mutate(estimate=(estimate))
+  vibration_data_for_reg = vibration_data %>% select(-c(std.error,p.value,statistic,independent_feature,dependent_feature))
   #regout = broom.mixed::tidy(lmer(estimate ~ . -term + (1|term),data=vibration_data_for_reg))
   regout = broom::tidy(lm(abs(estimate) ~ .,data=vibration_data_for_reg))
  # regout = regout %>% filter(term!='(Intercept)',effect=='fixed') %>% select(-group,-effect)
   regout = regout %>% filter(term!='(Intercept)')
 # coefficients = as.data.frame(as.matrix(coef(regout))) %>% rownames_to_column('term') %>% arrange(1)
-  coefficients = left_join(regout,dictionary %>% select(Variable.Name,Variable.Description) %>% distinct,by=c('term'='Variable.Name')) %>% filter(!is.na(Variable.Description)) %>% select(Variable.Description,term,estimate,std.error)  %>% distinct()
+  coefficients = left_join(regout,dictionary %>% select(Variable.Name,Variable.Description) %>% distinct,by=c('term'='Variable.Name')) %>% filter(!is.na(Variable.Description)) %>% select(Variable.Description,term,estimate,std.error,p.value)  %>% distinct()
  # bot_confounder_analysis = coefficients %>% arrange(estimate) %>% distinct %>% head(25)
   tbca = coefficients %>% arrange(desc(estimate)) %>% distinct
   #tbca = bind_rows(tbca,bot_confounder_analysis)
@@ -116,11 +130,16 @@ setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
 dictionary = read.csv('dataDictionary_NHANES.csv')
 
 files=list.files()[grep('output',list.files())]
+files=files[-grep('median',files)]
 all_vibration_data=list() 
 summary_data=list()
 for(f in files){
     data=readRDS(f)
     vibration_output=data$vibration_output
+    if(grepl('MCQ300',f)){
+      vibration_output$data = vibration_output$data %>% filter(term == 'MCQ300A2')
+      vibration_output$summarized_vibration_output = summarize_vibration_data_by_feature(vibration_output$data)
+    }
     summary_data[[f]] = vibration_output$summarized_vibration_output %>% mutate(independent_feature = paste(data$initial_association_output[['term']],collapse='__'))
     all_vibration_data[[f]]=vibration_output
 }
@@ -146,56 +165,156 @@ for(name in dfs){
     if(i=='BMXBMI' & name=='BMXBMI'){
       next
     }
-    vibration_data2 = vibration_data %>% filter(term==i) %>% select(-term)
+    vibration_data2 = vibration_data %>% filter(term==i) %>% select(-term) 
     if(nrow(vibration_data2)==0){
       next
     }
   conf_analysis_temp = get_confounders(vibration_data2,dictionary,name,i)
   conf_analysis[[paste(i,name)]]=conf_analysis_temp
-    max_x_val = max(abs(full_output %>% filter(term==i) %>% select(estimate) %>% range))+.001
+    max_x_val = max(abs(full_output %>% filter(term==i) %>% select(estimate) %>% range))
     max_y_val = unlist(unname(-log10(quantile(full_output %>% filter(term==i) %>% filter(p.value!=0) %>% select(p.value) %>% unlist %>% unname,.01))))+.01*-log10(min(full_output%>% filter(p.value!=0)  %>% filter(term==i) %>% select(p.value)))
     if(max_y_val<=log10(0.05)){
       max_y_val=1.5
     }
-    if(i=='BMXBMI'){
-      max_y_val=18
+    #if(i=='BMXBMI'){
+    #  max_y_val=18
+    #}
+    if(i %in% c('flag_LISINOPRIL','flag_LEVOTHYROXINE','INDFMMPI','flag_METFORMIN','DR1TCALC','FFQ0032','LBDVIASI','median_30890','DBQ197')){
+    max_x_val = max(abs(full_output %>% filter(term==i,dependent_feature==name) %>% select(estimate) %>% range))
+    max_y_val = 8
     }
-    ggplot(data = vibration_data2, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=100)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
+    ggplot(data = vibration_data2, aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=150)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
     ggsave(paste('../figures/',name,'_',i,'.pdf',sep=''),width=3,height=3)
   }
 }
 
 conf_analysis = bind_rows(conf_analysis)
 
-#ggplot(conf_analysis,aes(x=reorder(variable_description,estimate),y=estimate,fill=dep_feature)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+ggtitle('Adjusters driving VoE')+geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))
+```
+```{r}
+#get example models for F2
+setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
 
-#ggsave('figures/confounder_analysis.pdf',width=12,height=7)
+max_y_val = 8
+
+full_output = bind_rows(purrr::map(all_vibration_data, function(x) x[[3]] %>% mutate(phenoname=names(x)[3])))
+full_output$term = factor(full_output$term)
+full_output = full_output %>% filter(!is.na(p.value))
+
+sys_lip = full_output %>% filter(dependent_feature == 'SYSBP',independent_feature == 'flag_LISINOPRIL') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% mutate(sumval = rowSums(full_output %>% filter(dependent_feature == 'SYSBP',independent_feature == 'flag_LISINOPRIL') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% select(-estimate,-std.error,-full_fits,-p.value,-statistic))) %>% arrange(sumval) %>% select(full_fits,estimate,p.value)
+data.frame(sys_lip %>% filter(estimate>0))[1,1]
+data.frame(sys_lip %>% filter(estimate<0))[1,1] 
+
+max_x_val = max(abs(full_output %>% filter(term=='flag_LISINOPRIL',dependent_feature=='SYSBP') %>% select(estimate) %>% range))
+
+foo = bind_rows(data.frame(sys_lip %>% filter(estimate>0))[1,1][[1]] %>% filter(term=='flag_LISINOPRIL') %>% select(estimate,p.value),data.frame(sys_lip %>% filter(estimate<0))[1,1][[1]] %>% filter(term=='flag_LISINOPRIL') %>% select(estimate,p.value))
+
+ggplot(data = foo, aes(x = estimate, y = -log10(p.value))) + geom_point() + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)
+ggsave(paste('../figures/','SYSBP','_BLANK_','flag_LISINOPRIL','.pdf',sep=''),width=3,height=3)
+
+
+gluc_inc = full_output %>% filter(dependent_feature == 'LBDGLUSI',independent_feature == 'INDFMMPI') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% mutate(sumval = rowSums(full_output %>% filter(dependent_feature == 'LBDGLUSI',independent_feature == 'INDFMMPI') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% select(-estimate,-std.error,-full_fits,-p.value,-statistic))) %>% arrange(sumval) %>% select(full_fits,estimate,p.value)
+
+data.frame(gluc_inc %>% filter(estimate>0))[2,1]
+data.frame(gluc_inc %>% filter(estimate<0))[1,1]
+
+max_x_val = max(abs(full_output %>% filter(term=='INDFMMPI',dependent_feature=='LBDGLUSI') %>% select(estimate) %>% range))
+
+foo = bind_rows(data.frame(gluc_inc %>% filter(estimate>0))[1,1][[1]] %>% filter(term=='INDFMMPI') %>% select(estimate,p.value),data.frame(gluc_inc %>% filter(estimate<0))[1,1][[1]] %>% filter(term=='INDFMMPI') %>% select(estimate,p.value))
+
+ggplot(data = foo, aes(x = estimate, y = -log10(p.value))) + geom_point() + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)
+ggsave(paste('../figures/','LBDGLUSI','_BLANK_','INDFMMPI','.pdf',sep=''),width=3,height=3)
+
+
+bone_calc = full_output %>% filter(dependent_feature == 'DXXOFBMD',independent_feature == 'DR1TCALC') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% mutate(sumval = rowSums(full_output %>% filter(dependent_feature == 'DXXOFBMD',independent_feature == 'DR1TCALC') %>% filter(p.value<0.05) %>% select_if(~ length(unique(.)) > 1) %>% select(-estimate,-std.error,-full_fits,-p.value,-statistic))) %>% arrange(sumval) %>% select(full_fits,estimate,p.value)
+data.frame(bone_calc %>% filter(estimate>0))[1,1]
+data.frame(bone_calc %>% filter(estimate<0))[1,1]
+
+max_x_val = max(abs(full_output %>% filter(term=='DR1TCALC',dependent_feature=='DXXOFBMD') %>% select(estimate) %>% range))
+
+foo = bind_rows(data.frame(bone_calc %>% filter(estimate>0))[1,1][[1]] %>% filter(term=='DR1TCALC') %>% select(estimate,p.value),data.frame(bone_calc %>% filter(estimate<0))[1,1][[1]] %>% filter(term=='DR1TCALC') %>% select(estimate,p.value))
+
+ggplot(data = foo, aes(x = estimate, y = -log10(p.value))) + geom_point() + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)
+ggsave(paste('../figures/','DR1TCALC','_BLANK_','DXXOFBMD','.pdf',sep=''),width=3,height=3)
+
+vision_carrots = full_output %>% filter(dependent_feature == 'VIDLVA',independent_feature == 'FFQ0032') %>% select_if(~ length(unique(.)) > 1) %>% mutate(sumval = rowSums(full_output %>% filter(dependent_feature == 'VIDLVA',independent_feature == 'FFQ0032') %>% select_if(~ length(unique(.)) > 1) %>% select(-estimate,-std.error,-full_fits,-p.value,-statistic))) %>% arrange(sumval) %>% select(full_fits,estimate,p.value)
+data.frame(vision_carrots %>% filter(estimate>0) %>% arrange(p.value))[1,1]
+data.frame(vision_carrots %>% filter(estimate<0)%>% filter(p.value<0.05))[1,1]
+
+max_x_val = max(abs(full_output %>% filter(term=='FFQ0032',dependent_feature=='VIDLVA') %>% select(estimate) %>% range))
+
+foo = bind_rows(data.frame(vision_carrots %>% filter(estimate>0) %>% arrange(p.value))[1,1][[1]] %>% filter(term=='FFQ0032') %>% select(estimate,p.value),data.frame(vision_carrots %>% filter(estimate<0)%>% filter(p.value<0.05))[1,1][[1]] %>% filter(term=='FFQ0032') %>% select(estimate,p.value))
+
+ggplot(data = foo, aes(x = estimate, y = -log10(p.value))) + geom_point() + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)
+ggsave(paste('../figures/','FFQ0032','_BLANK_','VIDLVA','.pdf',sep=''),width=3,height=3)
+
+
+
+```
+
+```{r}
+#load and process covid data
+
+setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
+
+data = readRDS('vitd_median_30890_quantvoe_output.rds')
+vibration_data = data$vibration_output
+
+write.csv(data$vibration_output$summarized_vibration_output,'~/GitHub/quantvoe/manuscript/figures/voe_summary_data_covid.csv')
+
+max_x_val = max(abs(vibration_data$data %>% filter(dependent_feature=='covid_hosp_status') %>% select(estimate) %>% range))
+max_y_val = 8
+
+ggplot(data = vibration_data$data %>% filter(dependent_feature=='covid_hosp_status'), aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=150)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,8)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
+
+ggsave(paste('../figures/vitd_covid_hosp.pdf',sep=''),width=3,height=3)
+
+max_x_val = max(abs(vibration_data$data %>% filter(dependent_feature=='covid_positive_status') %>% select(estimate) %>% range))
+max_y_val = 8
+
+ggplot(data = vibration_data$data %>% filter(dependent_feature=='covid_positive_status'), aes(x = estimate, y = -log10(p.value))) +geom_hex(bins=150)  +theme(legend.position="bottom") +theme(legend.title = element_blank()) + xlab('Estimate') + theme(legend.text=element_text(size=6))+ggtitle(paste(name,i,sep='_'))+ theme(plot.title = element_text(size=12)) + geom_hline(yintercept = -log10(0.05)) + xlim(-1*max_x_val,max_x_val) + ylim(0,8)+theme(plot.title = element_blank())+scale_fill_gradientn(limits = c(0,1000),breaks=c(250,500,750),colors=c("navyblue", "darkmagenta", "darkorange1"))+ theme(legend.position = "none")
+
+ggsave(paste('../figures/vitd_covid_pos.pdf',sep=''),width=3,height=3)
+
+
+```
+
+```{r}
+#covid positivity analysis -- run immediately after prior chunk
+setwd('~/GitHub/quantvoe/manuscript/manuscript_data/')
+
+vitd_covid = vibration_data$data %>% filter(dependent_feature == 'covid_positive_status', p.value<0.1) %>% select_if(~ length(unique(.)) > 1) %>% mutate(sumval = rowSums(vibration_data$data %>% filter(dependent_feature == 'covid_positive_status',p.value<0.1) %>% select_if(~ length(unique(.)) > 1) %>% select(-estimate,-std.error,-full_fits,-p.value,-statistic))) %>% arrange(sumval) %>% select(full_fits,estimate,p.value)
+data.frame(vitd_covid %>% filter(estimate>0) %>% filter(p.value<0.05))[1,1]
+data.frame(vitd_covid %>% filter(estimate<0))[1,1] 
+
+foo = bind_rows(data.frame(vitd_covid %>% filter(estimate<0))[1,1] [[1]] %>% filter(term=='median_30890') %>% select(estimate,p.value),data.frame(vitd_covid %>% filter(estimate>0) %>% filter(p.value<0.05))[1,1][[1]] %>% filter(term=='median_30890') %>% select(estimate,p.value))
+
+ggplot(data = foo, aes(x = estimate, y = -log10(p.value))) + geom_point() + xlim(-1*max_x_val,max_x_val) + ylim(0,max_y_val)
+ggsave(paste('../figures/','covid','_BLANK_','median_30890','.pdf',sep=''),width=3,height=3)
 
 ```
 
 ```{r}
 #specific janus effect analysis
-deps_of_interest = c('LBDLDL','MSYS','LBXTC','BMXBMI')
-inds_of_interest = c('physical_activity','DR1TTFAT','LBXCOT','DR1TKCAL')
+deps_of_interest = c('LBDTCSI','SYSBP','BMXBMI','LBDLDLSI')
+inds_of_interest = c('DR1TFIBE','LBXCOT','DR1TKCAL','DR1TSUGR')
 
 val = paste(deps_of_interest,inds_of_interest,sep='_')
 
 conf_analysis2 = conf_analysis %>% mutate(temp=paste(dep_feature,ind_feature,sep='_')) %>% filter(temp %in% val) 
 
 for(val in seq(length(deps_of_interest))){
-  conf_analysis_sub_asr  = conf_analysis2 %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate)) %>% filter(term == 'RIDRETH1'|term=='SES_LEVEL'|term=='education')
-ggplot(conf_analysis_sub_asr,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))+ggtitle(paste(deps_of_interest[[val]],'~',inds_of_interest[[val]]))
+  conf_analysis_sub_asr  = conf_analysis2 %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate)) %>% filter(term == 'RIDRETH1'|term=='DMDEDUC2')
+ggplot(conf_analysis_sub_asr,aes(x=reorder(Variable.Description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') +ylab('') +geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))#+ggtitle(paste(deps_of_interest[[val]],'~',inds_of_interest[[val]]))
   ggsave(paste('figures/voeplots/',deps_of_interest[[val]],'_estabilished_confounders','.pdf',sep=''),width=2.5,height=5)
-    conf_analysis_sub  = conf_analysis2 %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate))  %>% filter(term != 'RIDRETH1'&term != 'male'& term!='RIDAGEYR'&term!='SES_LEVEL'&term!='education') %>% head(10)
-ggplot(conf_analysis_sub,aes(x=reorder(variable_description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))
+    conf_analysis_sub  = conf_analysis2 %>% filter(dep_feature == deps_of_interest[[val]], ind_feature == inds_of_interest[[val]]) %>% arrange(desc(estimate))  %>% filter(term != 'RIDRETH1'&term != 'male'& term!='RIDAGEYR'&term!='DMDEDUC2'&term!='education') %>% arrange(p.value)  %>% head(10) %>% arrange(estimate)
+    print(conf_analysis_sub)
+ggplot(conf_analysis_sub,aes(x=reorder(Variable.Description,desc(estimate)),y=estimate)) +geom_bar(stat='identity',position='dodge') +ylab('')+ xlab('') +geom_errorbar(aes(ymin =estimate-std.error,ymax=estimate+std.error), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=30,hjust=1))
   ggsave(paste('figures/voeplots/',deps_of_interest[[val]],'_confounders','.pdf',sep=''),width=5,height=5)
   vars = c(unname(unlist(conf_analysis_sub$term)),unname(unlist(conf_analysis_sub_asr$term)))
   for(v in vars){
     full_output_sub = full_output %>% filter(term == inds_of_interest[[val]], dependent_feature == deps_of_interest[[val]]) %>% select(estimate,p.value,term,dependent_feature,v)
-  max_x_val = max(abs(full_output_sub %>% select(estimate) %>% range))+.00001
- # if(deps_of_interest[[val]]=='BMXBMI'){
-#    max_x_val = .1
- # }
+  max_x_val = quantile(abs(full_output_sub %>% select(estimate) %>% range),.95)
   max_y_val = -log10(max(abs(full_output_sub %>% select(p.value) %>% range)))+1
   if(max_y_val<2){
     max_y_val=2
