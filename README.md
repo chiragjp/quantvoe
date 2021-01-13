@@ -22,16 +22,17 @@ physical activity and cholesterol levels. We'll refer to physical activity as th
 the "dependent variable."
 
 ```
-total_cholesterol ~ physical_activity + eosinophils_percent + protein_intake + vitamin_E
+bone_density ~ calcium_intake + age + sex + Vitamin_B12_intake
 
-total_cholesterol ~ physical_activity + triceps_skinfold_size + hepatitis_B + alkaline_phosphatase_levels + stomach_cancer + b-Cryptoxanthin_levels + prescription_drug_use
+bone_density ~ calcium_intake + age + sex + phosphorous_intake
+
 ``` 
 
-You might hypothesize that cholesterol would have some association, either negative or positive, with physical activity. It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between physical activity, cholesterol, and the other "adjusting variables" above.
+You might hypothesize that bone_density would have some association, either negative or positive, with calcium intake (i.e. does milk build strong bones?). It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between bone density, calcium intake, and these other dietary variables.
 
 "quantvoe" executes this approach process at massive scale, fitting (up to) every possible model given as set of adjusting variables, determining 1) how the association between your primary variable and dependent variable changes and 2) what the adjusters that appear to drive the change are. You end up with a plot like the one below, where each point represents a model and (the y-values are p-values, the x values are the effect size of the association between physical activity and total cholesterol, and the line represents statistical significance). 
 
-<img src="https://github.com/chiragjp/quantvoe/blob/main/images/LBXTC_physical_activity.png" width = "300" height = "300">
+<img src="https://github.com/chiragjp/quantvoe/blob/main/images/FIG2_voe_examples.png" width = "300" height = "300">
 
 As you can see, you have about a 50% chance of seeing a negative or positive, statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
 
