@@ -34,7 +34,7 @@ You might hypothesize that bone_density would have some association, either nega
 
 <img src="https://github.com/chiragjp/quantvoe/blob/main/images/FIG2_voe_examples.png" width = "300" height = "300">
 
-As you can see, you have about a 50% chance of seeing a negative or positive, statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
+As you can see, you could potentially see a positive or negative statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
 
 To learn more about vibration of effects, take a look at:
 
