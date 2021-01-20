@@ -3,12 +3,12 @@
 ## Introduction
 
 When computing any association between an X and a Y variable -- like coffee and heart attacks, 
-wine and mortality, or weight and type 2 diabetes onset, different modeling strategies can 
+wine and mortality, or weight and type 2 diabetes onset, different model specifications can 
 often yield different or even conflicting results. We refer to this as "vibration of effects," 
 and it permeates any field that uses observational data (which is most fields). Modeling vibration 
 of effects allows researchers to figure out what the most robust and reliable associations are, 
 which is ensuring our models are actually useful. We built this package to measure 
-vibration of effects, fitting hundreds, thousands, potentially millions of models to show 
+vibration of effects, fitting hundreds, thousands, or potentially millions of models to show 
 exactly how consistent an association output is. quantvoe can be used for everything from 
 clinical to economic data to tackle this problem, moving observational data science towards 
 consistent reproducibility.
