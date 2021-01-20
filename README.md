@@ -191,7 +191,7 @@ Common questions or issues will be put here for easy reference.
 
 ### How many vibrations should I do?
 
-We've found that an adjuster needs to be seen about 1000 times before you can consistently identify its impact on a given association.
+We've found that an adjuster needs to be seen about 300 times before you can consistently identify its impact on a given association. To figure out how many vibrations you need to do, you should modulate the maximal number of adjusters allowed in a given model while considering how many adjusters you aim to vibrate over.
 
 ### Optimizing runtime and parameters for a given dataset
 
