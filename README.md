@@ -1,4 +1,4 @@
-# quantvoe: Evaluating model robustness though vibration of effects
+# quantvoe: Evaluating association robustness though vibration of effects
 
 ## Introduction
 
