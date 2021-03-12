@@ -67,6 +67,7 @@ git clone https://github.com/chiragjp/quantvoe.git
 R CMD build /path/to/quantvoe/repository/
 R CMD install quantvoe_0.1.0.tar.gz
 ```
+Unfortunately, if you are lacking dependencies, you'll need to use devtools to install the package. Note, however, that the command line implementation (useful for large batch deployments), is only possible through a script (voe_command_line_deployment.R) in the GitHub repository.
 
 To install the most recent development version without cloning, use R's devtools package:
 ```
