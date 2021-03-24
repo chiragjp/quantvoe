@@ -1,14 +1,14 @@
-# quantvoe: Evaluating model robustness though vibration of effects
+# quantvoe: Evaluating association robustness though vibration of effects
 
 ## Introduction
 
 When computing any association between an X and a Y variable -- like coffee and heart attacks, 
-wine and mortality, or weight and type 2 diabetes onset, different modeling strategies can 
+wine and mortality, or weight and type 2 diabetes onset, different model specifications can 
 often yield different or even conflicting results. We refer to this as "vibration of effects," 
 and it permeates any field that uses observational data (which is most fields). Modeling vibration 
 of effects allows researchers to figure out what the most robust and reliable associations are, 
 which is ensuring our models are actually useful. We built this package to measure 
-vibration of effects, fitting hundreds, thousands, potentially millions of models to show 
+vibration of effects, fitting hundreds, thousands, or potentially millions of models to show 
 exactly how consistent an association output is. quantvoe can be used for everything from 
 clinical to economic data to tackle this problem, moving observational data science towards 
 consistent reproducibility.
@@ -22,18 +22,19 @@ physical activity and cholesterol levels. We'll refer to physical activity as th
 the "dependent variable."
 
 ```
-total_cholesterol ~ physical_activity + eosinophils_percent + protein_intake + vitamin_E
+bone_density ~ calcium_intake + age + sex + Vitamin_B12_intake
 
-total_cholesterol ~ physical_activity + triceps_skinfold_size + hepatitis_B + alkaline_phosphatase_levels + stomach_cancer + b-Cryptoxanthin_levels + prescription_drug_use
+bone_density ~ calcium_intake + age + sex + phosphorous_intake
+
 ``` 
 
-You might hypothesize that cholesterol would have some association, either negative or positive, with physical activity. It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between physical activity, cholesterol, and the other "adjusting variables" above.
+You might hypothesize that bone_density would have some association, either negative or positive, with calcium intake (i.e. does milk build strong bones?). It turns out you can actually see either relationship depending on how you look at it -- a statistically significant and negative one in the first model, a significant positive one in the second. This kind of result indicates a confounded (and potentially clinically/biologically interesting) relationship between bone density, calcium intake, and these other dietary variables.
 
 "quantvoe" executes this approach process at massive scale, fitting (up to) every possible model given as set of adjusting variables, determining 1) how the association between your primary variable and dependent variable changes and 2) what the adjusters that appear to drive the change are. You end up with a plot like the one below, where each point represents a model and (the y-values are p-values, the x values are the effect size of the association between physical activity and total cholesterol, and the line represents statistical significance). 
 
-<img src="https://github.com/chiragjp/quantvoe/blob/main/images/LBXTC_physical_activity.png" width = "300" height = "300">
+<img src="https://github.com/chiragjp/quantvoe/blob/main/images/FIG2_voe_examples.png" width = "300" height = "300">
 
-As you can see, you have about a 50% chance of seeing a negative or positive, statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
+As you can see, you could potentially see a positive or negative statistically significant correlation depending on the model you fit. Most studies will only fit one model, potentially obscuring this kind of result.
 
 To learn more about vibration of effects, take a look at:
 
@@ -66,11 +67,18 @@ git clone https://github.com/chiragjp/quantvoe.git
 R CMD build /path/to/quantvoe/repository/
 R CMD install quantvoe_0.1.0.tar.gz
 ```
+Unfortunately, if you are lacking dependencies, you'll need to use devtools to install the package. Note, however, that the command line implementation (useful for large batch deployments), is only possible through a script (voe_command_line_deployment.R) in the GitHub repository.
 
-To install the most recent development version without cloning, use R's devtools package:
+To use devtools:
 ```
 #if devtools is not already installed, do so with install.packages() from the R terminal
 install.packages('devtools')
+devtools::install_local("/path/to/quantvoe/repository/")
+```
+
+And to use devtools without cloning:
+
+```
 devtools::install_github("chiragjp/quantvoe")
 ```
 
@@ -101,7 +109,7 @@ Rscript voe_command_line_deployment.R -h
 | primary_variable      |  -v  | The primary independent variable of interest.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Yes       |
 | constant_adjusters    |  -j  | Comma-separated (no spaces) list of adjusters to include in every model. Should correspond to column names in your independent data (Default = NULL)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No       |
 | output                |  -o  | Path to and name of output .rds file (e.g. ./output.rds) .                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Yes       |
-| fdr_method            |  -m  | Your choice of method for adjusting p-values. Options are BY   (default), BH, or bonferroni. Adjustment is computed for all initial, single   variable, associations across all dependent features.                                                                                                                                                                                                                                                                                                                                                                                | No        |
+| fdr_method            |  -m  | Your choice of method for adjusting p-values. Options are BY (default), BH, or bonferroni. Adjustment is computed for all initial, single   variable, associations across all dependent features. To not use FDR adjustment but still set a pvalue cutoff less than 1, passs 'p.value' to this argument.                                                                                                                                                                                                                                                                                                                                                                                | No        |
 | fdr_cutoff            |  -c  | Cutoff for an FDR significant association. All features with   adjusted p-values initially under this value will be selected for vibrations.   (default = 0.05). Setting a stringent FDR cutoff is mostly relevant when you   are using a large number of dependent variables (eg >50) and want to   filter those with weak initial associations.                                                                                                                                                                                                                                  | No        |
 | proportion_cutoff     |  -g  | A float between 0 and 1. Setting this filters out dependent   features that are this proportion of zeros or more (default = 1, so no   filtering will be done.)                                                                                                                                                                                                                                                                                                                                                                                                                    | No        |
 | vibrate               |  -b  | TRUE/FALSE -- run vibrations (default = TRUE).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No        |
@@ -190,7 +198,7 @@ Common questions or issues will be put here for easy reference.
 
 ### How many vibrations should I do?
 
-We've found that an adjuster needs to be seen about 1000 times before you can consistently identify its impact on a given association.
+We've found that an adjuster needs to be seen about 300 times before you can consistently identify its impact on a given association. To figure out how many vibrations you need to do, you should modulate the maximal number of adjusters allowed in a given model while considering how many adjusters you aim to vibrate over.
 
 ### Optimizing runtime and parameters for a given dataset
 
