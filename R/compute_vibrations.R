@@ -149,7 +149,7 @@ dataset_vibration <-function(subframe,primary_variable,constant_adjusters,model_
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @export
-compute_vibrations <- function(bound_data,primary_variable,constant_adjusters,model_type,features_of_interest,max_vibration_num,proportion_cutoff,cores,max_vars_in_model,family,ids,strata,weights,nest){
+compute_vibrations <- function(bound_data,primary_variable,constant_adjusters = NULL,model_type = 'glm',features_of_interest,max_vibration_num = 10000,proportion_cutoff = 1,cores = 1,max_vars_in_model = 20,family = gaussian(),ids = NULL,strata = NULL,weights = NULL,nest = NULL){
   output = dplyr::bind_rows(apply(bound_data, 1, function(subframe) dataset_vibration(subframe, primary_variable,constant_adjusters,model_type ,features_of_interest,max_vibration_num, proportion_cutoff,cores,max_vars_in_model,family,ids,strata,weights,nest)))
   output = output %>% dplyr::filter(!is.na(.data$dependent_feature))
   vibration_variables = unique(unlist(unname(apply(bound_data, 1, function(subframe) subframe[[2]] %>% dplyr::select(-.data$sampleID,-primary_variable) %>% colnames))))

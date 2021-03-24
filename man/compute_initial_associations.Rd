@@ -7,15 +7,15 @@
 compute_initial_associations(
   bound_data,
   primary_variable,
-  constant_adjusters,
-  model_type,
-  proportion_cutoff,
-  vibrate,
-  family,
-  ids,
-  strata,
-  weights,
-  nest
+  constant_adjusters = NULL,
+  model_type = "glm",
+  proportion_cutoff = 1,
+  vibrate = TRUE,
+  family = gaussian(),
+  ids = NULL,
+  strata = NULL,
+  weights = NULL,
+  nest = NULL
 )
 }
 \arguments{

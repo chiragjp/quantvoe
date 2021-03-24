@@ -19,8 +19,12 @@
 #' @keywords regression, initial association
 regression <- function(j,independent_variables,dependent_variables,primary_variable,constant_adjusters,model_type,proportion_cutoff,family,ids,strata,weights,nest){
   feature_name = colnames(dependent_variables)[j+1]
+  if(primary_variable %in% colnames(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)))){
+    return('Regression not run due to presence of primary variable in dependent variable dataframe')
+  }
   regression_df=suppressMessages(dplyr::left_join(dependent_variables %>% dplyr::select(.data$sampleID,c(feature_name)),independent_variables %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))
   regression_df = regression_df %>% dplyr::select(-.data$sampleID)
+  #final check to confirm ready for regressions
   #run regression
   if(!is.null(constant_adjusters)){
     primary_variable_formodel = paste(primary_variable,'+',paste(constant_adjusters,sep='+',collapse='+'))
@@ -135,7 +139,7 @@ run_associations <- function(x,primary_variable,constant_adjusters,model_type,pr
 #' @importFrom dplyr "%>%"
 #' @keywords regression, initial association
 #' @export
-compute_initial_associations <- function(bound_data,primary_variable, constant_adjusters,model_type, proportion_cutoff,vibrate,family,ids,strata,weights,nest){
+compute_initial_associations <- function(bound_data,primary_variable, constant_adjusters = NULL,model_type = 'glm', proportion_cutoff = 1,vibrate = TRUE,family = gaussian(),ids = NULL,strata =NULL,weights =NULL,nest = NULL){
     output = apply(bound_data, 1, function(x) run_associations(x,primary_variable,constant_adjusters,model_type,proportion_cutoff,vibrate,family,ids,strata,weights,nest))
     output_regs = purrr::map(output, function(x) x[[1]])
     output_vib = unlist(unname(unique(purrr::map(output, function(x) x[[2]]))))

@@ -20,7 +20,7 @@
 #' @param nest If TRUE, relabel cluster ids to enforce nesting within strata.
 #' @importFrom rlang .data
 #' @keywords pipeline
-pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,constant_adjusters,fdr_method,fdr_cutoff,max_vibration_num,max_vars_in_model,proportion_cutoff,meta_analysis,model_type,family,ids,strata,weights,nest){
+pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,constant_adjusters=NULL,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=10000,max_vars_in_model=20,proportion_cutoff=1,meta_analysis=FALSE,model_type='glm',family=gaussian(),ids = NULL,strata = NULL,weights = NULL,nest = NULL){
   print('Checking input data...')
   if(model_type=='survey'){
     print('Running a survey weighted regression, using the following passed parameters for the design:')
@@ -50,10 +50,10 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     Sys.sleep(2)
     max_models = sum(data_summary$max_models_per_feature*data_summary$`Number of features`)
     print(paste('This works out to a max of',as.character(max_models),'models across all features.'))
-    if(max_models>10000000){
-      print('Warning: a run at this scale (over 10 million models fit) may take a long time.')
-      Sys.sleep(2)
-    }
+   # if(max_models>10000000){
+   #   print('Warning: a run at this scale (over 10 million models fit) may take a long time.')
+   #   Sys.sleep(2)
+   # }
     print('Checking sample IDs...')
     ind_sampids=purrr::map(independent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
     dep_sampids=purrr::map(dependent_variables, function(x) x %>% dplyr::select(colnames(x)[1]))
@@ -86,10 +86,10 @@ pre_pipeline_data_check <- function(dependent_variables,independent_variables,pr
     max_models_per_feature = num_ind*max_vibration_num
     max_models = num_features*max_models_per_feature
     print(paste('This works out to a max of',as.character(max_models),'models across all features.'))
-    if(max_models>10000000){
-      print('Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
-      Sys.sleep(2)
-    }
+  #  if(max_models>10000000){
+  #    print('Warning: a run at this scale (over 10 million models fit) may take a long time. If you\'re running this interactively, we recommend splitting your input features into batches or using our command line tool.')
+  #    Sys.sleep(2)
+  #  }
     print('Checking sample IDs...')
     ind_sampids=independent_variables[,1]
     dep_sampids=dependent_variables[,1]

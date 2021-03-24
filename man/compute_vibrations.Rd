@@ -7,18 +7,18 @@
 compute_vibrations(
   bound_data,
   primary_variable,
-  constant_adjusters,
-  model_type,
+  constant_adjusters = NULL,
+  model_type = "glm",
   features_of_interest,
-  max_vibration_num,
-  proportion_cutoff,
-  cores,
-  max_vars_in_model,
-  family,
-  ids,
-  strata,
-  weights,
-  nest
+  max_vibration_num = 10000,
+  proportion_cutoff = 1,
+  cores = 1,
+  max_vars_in_model = 20,
+  family = gaussian(),
+  ids = NULL,
+  strata = NULL,
+  weights = NULL,
+  nest = NULL
 )
 }
 \arguments{
