@@ -35,7 +35,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
     if(length(varset)>as.numeric(max_vibration_num)){
       varset=sample(varset,as.numeric(max_vibration_num))
     }
-    regression_df = merged_data %>% dplyr::select(c(dplyr::all_of(feature),dplyr::all_of(constant_adjusters),dplyr::all_of(primary_variable),dplyr::all_of(weights),dplyr::all_of(strata),dplyr::all_of(ids),dplyr::all_of(variables_to_vibrate)))
+    regression_df = merged_data %>% dplyr::select(c(tidyselect::all_of(feature),tidyselect::all_of(constant_adjusters),tidyselect::all_of(primary_variable),tidyselect::all_of(weights),tidyselect::all_of(strata),tidyselect::all_of(ids),tidyselect::all_of(variables_to_vibrate)))
     if(!is.null(constant_adjusters)){
       primary_variable_formodel = paste(primary_variable,'+',paste(constant_adjusters,sep='+',collapse='+'))
     }
@@ -50,13 +50,13 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         constant_adjusters = paste(constant_adjusters,sep='+',collapse='+'),
         dataset_id = dataset_id,
         vars = varset,
-        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(MASS::glm.nb(formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable_formodel,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),weights=regression_df %>% dplyr::select(dplyr::all_of(weights)) %>% unlist %>% unname,data = regression_df)),warning = function(w) w, error = function(e) e)),
+        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(MASS::glm.nb(formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable_formodel,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),weights=regression_df %>% dplyr::select(tidyselect::all_of(weights)) %>% unlist %>% unname,data = regression_df)),warning = function(w) w, error = function(e) e)),
         feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
         )
       ))
      }
     if(model_type=='survey'){
-      dsn=survey::svydesign(weights=regression_df %>% dplyr::select(dplyr::all_of(weights)) %>% unlist %>% unname,ids=regression_df %>% dplyr::select(dplyr::all_of(ids)) %>% unlist %>% unname,nest=as.logical(nest),strata=regression_df %>% dplyr::select(dplyr::all_of(strata))  %>% unlist %>% unname,data=regression_df)
+      dsn=survey::svydesign(weights=regression_df %>% dplyr::select(tidyselect::all_of(weights)) %>% unlist %>% unname,ids=regression_df %>% dplyr::select(tidyselect::all_of(ids)) %>% unlist %>% unname,nest=as.logical(nest),strata=regression_df %>% dplyr::select(tidyselect::all_of(strata))  %>% unlist %>% unname,data=regression_df)
         return(tibble::tibble(
         dependent_feature = feature,
         independent_feature = primary_variable,
@@ -75,7 +75,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
         constant_adjusters = paste(constant_adjusters,sep='+',collapse='+'),
         dataset_id = dataset_id,
         vars = varset,
-        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(stats::glm(formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable_formodel,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),weights=regression_df %>% dplyr::select(dplyr::all_of(weights)) %>% unlist %>% unname,family=family,data = regression_df)),warning = function(w) w, error = function(e) e)),
+        full_fits = purrr::map(.data$vars, function(y) tryCatch(broom::tidy(stats::glm(formula=stats::as.formula(paste("I(`",feature,"`) ~ ",primary_variable_formodel,'+',paste(y,collapse='+',sep='+'),sep='',collapse='')),weights=regression_df %>% dplyr::select(tidyselect::all_of(weights)) %>% unlist %>% unname,family=family,data = regression_df)),warning = function(w) w, error = function(e) e)),
         feature_fit = purrr::map(.data$full_fits, function(x) tryCatch(dplyr::filter(x, grepl(primary_variable,.data$term)),warning = function(w) w,error = function(e) e)
         )
       ))
@@ -111,11 +111,11 @@ dataset_vibration <-function(subframe,primary_variable,constant_adjusters,model_
   tokeep = in_sub %>% dplyr::select_if(~ length(unique(.)) > 1) %>% colnames
   todrop = setdiff(colnames(in_sub),tokeep)
   if(length(todrop)>1){
-    in_sub=in_sub %>% dplyr::select(-dplyr::all_of(todrop))
+    in_sub=in_sub %>% dplyr::select(-tidyselect::all_of(todrop))
   }
   features_of_interest = intersect(features_of_interest,colnames(dep_sub))
   dep_sub = dep_sub %>% dplyr::select(.data$sampleID,c(features_of_interest))
-  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,dplyr::all_of(constant_adjusters),dplyr::all_of(strata),dplyr::all_of(weights),dplyr::all_of(ids),dplyr::all_of(primary_variable))))
+  variables_to_vibrate=colnames(in_sub %>% dplyr::select(-c(.data$sampleID,tidyselect::all_of(constant_adjusters),tidyselect::all_of(strata),tidyselect::all_of(weights),tidyselect::all_of(ids),tidyselect::all_of(primary_variable))))
   merged_data=suppressMessages(dplyr::left_join(in_sub %>% dplyr::mutate_if(is.factor, as.character), dep_sub %>% dplyr::mutate_if(is.factor, as.character)) %>% dplyr::mutate_if(is.character, as.factor))
   if(as.integer(cores)>1){
     options(future.globals.maxSize = +Inf)
