@@ -188,7 +188,7 @@ Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and p
 
 
 ```
-Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic_bmi.rds,inst/extdata/example_data_dataset_2_dependent_systolic_bmi.rds -i data/example_data_dataset_1_independent.rds,inst/extdata/example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey -a TRUE
+Rscript voe_command_line_deployment.R -d inst/extdata/example_data_dataset_1_dependent_systolic_bmi.rds,inst/extdata/example_data_dataset_2_dependent_systolic_bmi.rds -i inst/extdata/example_data_dataset_1_independent.rds,inst/extdata/example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey -a TRUE
 
 ```
     
