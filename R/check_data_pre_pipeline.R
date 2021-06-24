@@ -22,6 +22,7 @@
 #' @keywords pipeline
 pre_pipeline_data_check <- function(dependent_variables,independent_variables,primary_variable,constant_adjusters=NULL,fdr_method='BY',fdr_cutoff=0.05,max_vibration_num=10000,max_vars_in_model=20,proportion_cutoff=1,meta_analysis=FALSE,model_type='glm',family=gaussian(),ids = NULL,strata = NULL,weights = NULL,nest = NULL){
   print('Checking input data...')
+  temp = getopt::sort_list(list())
   if(model_type=='survey'){
     print('Running a survey weighted regression, using the following passed parameters for the design:')
     print(paste('weight = ',weights))
