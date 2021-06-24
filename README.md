@@ -145,10 +145,13 @@ Both our R terminal and command line implementations output a named list contain
 |                            |           |                                                                                                 | confounder_analysis         | Quantification of the impact of different adjusters on  association of interesst                        |
 |                            |           |                                                                                                 | data                        | Raw vibration data, each row in dataframe corresponds to a different   model                            |                                                                                                     |
 
-## Testing
+## Package vignette
 
-Unit tests can be deployed by running the following in the R terminal after loading the package:
+To aim in demonstrating how quantvoe can be used not at the command line -- but instead in the R terminal -- we provide a package vignette in the quantvoe/vignettes directory. This R markdown script shows how the package can be run using a single function. It uses toy datasets already built into the package that will be loaded with quantvoe itself. It additionally provides clear exploration of the data and specific analysis of the output, thereby enabling its use as an example in how VoE results can be plotted and understood.
 
+We additionally recommend use the vignette, alongside the unit testing suite and example command line deployments below, as a further test to ensure the package is built properly on your machine. As always, if you run into any issues, please feel free to report the problem on our GitHub repository.
+
+To access the vignette in the R terminal, you can XXX.
 ```
 devtools::test('/path/to/package/repository')
 ```
@@ -159,9 +162,28 @@ or after building at the command line:
 R CMD check /path/to/package/binary
 ```
 
+## Unit testing suite
+
+We additionally provide a testing suite of the core functions within quantvoe. Specifically, they test and check the output of the following functions with a number of different parameters (e.g. model link function):
+
+* compute_associations()
+* compute_metaanalysis()
+* compute_vibrations()
+* voe_pipeline()
+
+Together, these 4 functions encapsulate the major functionality of quantvoe. They are written using R's testthat package and can be found in the tests/testthat/ directory. The datasets used in these tests are also found in the tests/testthat/ directory.
+
+All tests can be deployed at once in the R terminal. This is achieved by the following command:
+
+```
+devtools::test('/path/to/package/repository')
+```
+
+Specifically, /path/to/package/repository should be replaced with the path to the quantvoe folder on your local directory. We provide screenshots of the successful test output in the tests directory as well.
+
 ## Example command-line deployments
 
-All of these examples can be run using the files in the [data folder](https://github.com/chiragjp/quantvoe/tree/main/data). For a more in-depth example that that explores the pipeline output, check out our package [vignette](https://github.com/chiragjp/quantvoe/tree/main/vignettes)
+One of the most powerful tools in quantvoe is the command-line deployment option, which, as we describe at the top of this README, is recommended for most large-scale deployments. All of these examples can be run using the files in the [data folder](https://github.com/chiragjp/quantvoe/tree/main/inst/extdata). For a more in-depth example that that explores the pipeline output, check out our package [vignette](https://github.com/chiragjp/quantvoe/tree/main/vignettes)
 
 ### Beginner
 
