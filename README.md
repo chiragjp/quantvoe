@@ -173,10 +173,10 @@ Together, these 4 functions encapsulate the major functionality of quantvoe. The
 All tests can be deployed at once in the R terminal. This is achieved by the following command:
 
 ```
-devtools::test('/path/to/package/repository')
+devtools::test('quantvoe')
 ```
 
-Specifically, /path/to/package/repository should be replaced with the path to the quantvoe folder on your local directory. We provide screenshots of the successful test output in the tests directory as well.
+As above, "quantvoe" should be replaced with the path to the quantvoe folder on your local directory. We provide screenshots of the successful test output in the tests directory as well.
 
 ## Example command-line deployments
 
