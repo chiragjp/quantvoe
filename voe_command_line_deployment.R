@@ -64,7 +64,7 @@ dependent_variables=list()
 
 if(length(unlist(dependent_variable_locs))>1){
 	for(i in unlist(dependent_variable_locs)){
-    data = tibble::tibble(readRDS(trimws(i)))[[1]]
+    data = tibble::tibble(readRDS(trimws(i)))
     colnames(data)[1]='sampleID'
 		dependent_variables[[i]] = data
   }
@@ -80,7 +80,7 @@ independent_variables=list()
 
 if(length(unlist(independent_variable_locs))>1){
   for(i in unlist(independent_variable_locs)){
-    data = tibble::tibble(readRDS(trimws(i)))[[1]]
+    data = tibble::tibble(readRDS(trimws(i)))
     colnames(data)[1]='sampleID'
     independent_variables[[i]] = data
   }
