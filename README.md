@@ -65,12 +65,10 @@ We recommend building from the Git repo using R's devtools package as follows:
 ```
 git clone https://github.com/chiragjp/quantvoe.git
 ```
-Then open the R terminal (i.e. either open R studio or type R at the command line). Note that to run the command line script you will also need to install the `optparse` library separately.
-
+Then open the R terminal (i.e. either open R studio or type R at the command line). 
 ```
 #if devtools is not already installed, do so with install.packages() from the R terminal
 install.packages('devtools')
-install.package('optparse')
 devtools::install_local("quantvoe")
 ```
 
