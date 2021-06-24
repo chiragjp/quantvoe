@@ -60,23 +60,27 @@ Where the y variable is the coefficient on the primary_variable for each vibrati
 
 ## Installation
 
-We recommend building from the Git repo so you can easily access and use the command-line script (voe_command_line_deployment.R) in the root directory. Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")` at the R terminal.
+We recommend building from the Git repo using R's devtools package as follows: 
 
 ```
 git clone https://github.com/chiragjp/quantvoe.git
-R CMD build /path/to/quantvoe/repository/
-R CMD install quantvoe_0.1.0.tar.gz
 ```
-Unfortunately, if you are lacking dependencies, you'll need to use devtools to install the package. Note, however, that the command line implementation (useful for large batch deployments), is only possible through a script (voe_command_line_deployment.R) in the GitHub repository.
-
-To use devtools:
+Then open the R terminal (i.e. either open R studio or type R at the command line).
 ```
 #if devtools is not already installed, do so with install.packages() from the R terminal
 install.packages('devtools')
-devtools::install_local("/path/to/quantvoe/repository/")
+devtools::install_local("quantvoe")
 ```
 
-And to use devtools without cloning:
+"quantvoe", in the install_local() command should be the path folder containing the quantvoe GitHub repository on your computer.
+
+If you want to build the package vignette (see the vignettes section below), you will need to run:
+
+```
+devtools::install_local("quantvoe",build_vignettes=TRUE)
+```
+
+And to use devtools without cloning (though this will not give you access to the command line script without downloading it separately):
 
 ```
 devtools::install_github("chiragjp/quantvoe")
@@ -151,16 +155,8 @@ To aim in demonstrating how quantvoe can be used not at the command line -- but 
 
 We additionally recommend use the vignette, alongside the unit testing suite and example command line deployments below, as a further test to ensure the package is built properly on your machine. As always, if you run into any issues, please feel free to report the problem on our GitHub repository.
 
-To access the vignette in the R terminal, you can XXX.
-```
-devtools::test('/path/to/package/repository')
-```
+To access the vignette in the R terminal, you can run browseVignettes('quantvoe'). Note that for this command to work you must use the `build_vignettes = TRUE` flag in the installation of quantvoe.
 
-or after building at the command line:
-
-```
-R CMD check /path/to/package/binary
-```
 
 ## Unit testing suite
 
