@@ -60,23 +60,27 @@ Where the y variable is the coefficient on the primary_variable for each vibrati
 
 ## Installation
 
-We recommend building from the Git repo so you can easily access and use the command-line script (voe_command_line_deployment.R) in the root directory. Note that the command line implementation requires the "optparse" library, which can be installed with `install.packages("optparse")` at the R terminal.
+We recommend building from the Git repo using R's devtools package as follows: 
 
 ```
 git clone https://github.com/chiragjp/quantvoe.git
-R CMD build /path/to/quantvoe/repository/
-R CMD install quantvoe_0.1.0.tar.gz
 ```
-Unfortunately, if you are lacking dependencies, you'll need to use devtools to install the package. Note, however, that the command line implementation (useful for large batch deployments), is only possible through a script (voe_command_line_deployment.R) in the GitHub repository.
-
-To use devtools:
+Then open the R terminal (i.e. either open R studio or type R at the command line). 
 ```
 #if devtools is not already installed, do so with install.packages() from the R terminal
 install.packages('devtools')
-devtools::install_local("/path/to/quantvoe/repository/")
+devtools::install_local("quantvoe")
 ```
 
-And to use devtools without cloning:
+"quantvoe", in the install_local() command should be the path folder containing the quantvoe GitHub repository on your computer.
+
+If you want to build the package vignette (see the vignettes section below), you will need to run:
+
+```
+devtools::install_local("quantvoe",build_vignettes=TRUE)
+```
+
+And to use devtools without cloning (though this will not give you access to the command line script without downloading it separately, and you will still need t install optparse manually):
 
 ```
 devtools::install_github("chiragjp/quantvoe")
@@ -145,23 +149,36 @@ Both our R terminal and command line implementations output a named list contain
 |                            |           |                                                                                                 | confounder_analysis         | Quantification of the impact of different adjusters on  association of interesst                        |
 |                            |           |                                                                                                 | data                        | Raw vibration data, each row in dataframe corresponds to a different   model                            |                                                                                                     |
 
-## Testing
+## Package vignette
 
-Unit tests can be deployed by running the following in the R terminal after loading the package:
+To aim in demonstrating how quantvoe can be used not at the command line -- but instead in the R terminal -- we provide a package vignette in the quantvoe/vignettes directory. This R markdown script shows how the package can be run using a single function. It uses toy datasets already built into the package that will be loaded with quantvoe itself. It additionally provides clear exploration of the data and specific analysis of the output, thereby enabling its use as an example in how VoE results can be plotted and understood.
+
+We additionally recommend use the vignette, alongside the unit testing suite and example command line deployments below, as a further test to ensure the package is built properly on your machine. As always, if you run into any issues, please feel free to report the problem on our GitHub repository.
+
+To access the vignette in the R terminal, you can run browseVignettes('quantvoe'). Note that for this command to work you must use the `build_vignettes = TRUE` flag in the installation of quantvoe.
+
+## Unit testing suite
+
+We additionally provide a testing suite of the core functions within quantvoe. Specifically, they test and check the output of the following functions with a number of different parameters (e.g. model link function):
+
+* compute_associations()
+* compute_metaanalysis()
+* compute_vibrations()
+* voe_pipeline()
+
+Together, these 4 functions encapsulate the major functionality of quantvoe. They are written using R's testthat package and can be found in the tests/testthat/ directory. The datasets used in these tests are also found in the tests/testthat/ directory.
+
+All tests can be deployed at once in the R terminal. This is achieved by the following command:
 
 ```
-devtools::test('/path/to/package/repository')
+devtools::test('quantvoe')
 ```
 
-or after building at the command line:
-
-```
-R CMD check /path/to/package/binary
-```
+As above, "quantvoe" should be replaced with the path to the quantvoe folder on your local directory. We provide screenshots of the successful test output in the tests directory as well.
 
 ## Example command-line deployments
 
-All of these examples can be run using the files in the [data folder](https://github.com/chiragjp/quantvoe/tree/main/data). For a more in-depth example that that explores the pipeline output, check out our package [vignette](https://github.com/chiragjp/quantvoe/tree/main/vignettes)
+One of the most powerful tools in quantvoe is the command-line deployment option, which, as we describe at the top of this README, is recommended for most large-scale deployments. All of these examples can be run using the files in the [data folder](https://github.com/chiragjp/quantvoe/tree/main/inst/extdata). For a more in-depth example that that explores the pipeline output, check out our package [vignette](https://github.com/chiragjp/quantvoe/tree/main/vignettes)
 
 ### Beginner
 
@@ -182,13 +199,13 @@ Rscript voe_command_line_deployment.R -d inst/extdata/example_data_dataset_1_dep
 
 ```
 
-### Meta-analytic madman
+### Advanced (and meta-analytic)
 
 Compute VoE for multiple dependent variables (BMI and blood pressure + BMI and physical activity) and physical activity with across multiple datasets with custom parameters and survey weighting: 100 vibrations per dependent variable, 4 cores, max of 10 variables per model, FDR cutoff of 1 (vibrate over all initial association output).
 
 
 ```
-Rscript voe_command_line_deployment.R -d data/example_data_dataset_1_dependent_systolic_bmi.rds,inst/extdata/example_data_dataset_2_dependent_systolic_bmi.rds -i data/example_data_dataset_1_independent.rds,inst/extdata/example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey -a TRUE
+Rscript voe_command_line_deployment.R -d inst/extdata/example_data_dataset_1_dependent_systolic_bmi.rds,inst/extdata/example_data_dataset_2_dependent_systolic_bmi.rds -i inst/extdata/example_data_dataset_1_independent.rds,inst/extdata/example_data_dataset_2_independent.rds -v physical_activity -o nhanes_voe_sysbp_bmi_physact_meta_analysis.rds -c 1 -n 100 -r 10 -t 4 -w WTMEC2YR -y TRUE -k SDMVPSU -s SDMVSTRA -q TRUE -u survey -a TRUE
 
 ```
     

@@ -96,7 +96,7 @@ run_associations <- function(x,primary_variable,constant_adjusters,model_type,pr
       quit()
     }
   }
-  independent_variables=independent_variables %>% dplyr::select(-dplyr::all_of(todrop))
+  independent_variables=independent_variables %>% dplyr::select(-tidyselect::all_of(todrop))
   if(ncol(independent_variables)==2){
     vibrate=FALSE
   }

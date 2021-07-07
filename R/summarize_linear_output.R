@@ -26,7 +26,7 @@ get_adjuster_expanded_vibrations <- function(voe_df, adjusters, constant_adjuste
     copy_voe_df  = copy_voe_df %>% dplyr::mutate(newcol = purrr::map_int(copy_voe_df$vars, ~(variable %in% .)))
     colnames(copy_voe_df)[length(colnames(copy_voe_df))] <- variable
   }
-  copy_voe_df = copy_voe_df %>% dplyr::select(-dplyr::all_of(constant_adjusters))
+  copy_voe_df = copy_voe_df %>% dplyr::select(-tidyselect::all_of(constant_adjusters))
   return(copy_voe_df)
 }
 
