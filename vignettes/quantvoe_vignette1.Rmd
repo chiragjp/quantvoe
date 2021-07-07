@@ -142,12 +142,12 @@ ggplot(data=vibration_output[['data']] %>% filter(dependent_feature=='BMXBMI'),a
 
 Looks like we have janus effects (positive and negative associations depending on modeling strategy) in both. Not only that, it looks like you can achieve nominal statistical significance depending on model specification in both cases.
 
-To get an idea of what might be causing this, let's take a look at the confounder analysis.
+To get an idea of what might be causing this, let's take a look at the confounder analysis. This variable will contain both the summarized model output and the full model output. 
 ```{r}
 
-vibration_output[['confounder_analysis']] 
+vibration_output[['confounder_analysis']][[1]] 
 
-confounder_analysis_significant = vibration_output[['confounder_analysis']] %>% filter(abs(statistic)>2.5) %>% arrange(desc(estimate)) %>% filter(term!='(Intercept)')
+confounder_analysis_significant = vibration_output[['confounder_analysis']][[1]] %>% filter(abs(statistic)>2.5) %>% arrange(desc(estimate)) %>% filter(term!='(Intercept)')
 
 ggplot(confounder_analysis_significant,aes(x=reorder(term,estimate),y=estimate)) +geom_bar(stat='identity',position='dodge') + xlab('') + ylab('Change in model effect size')+ggtitle('Overall confounders of BMI and blood pressure associations with smoking ')+geom_errorbar(aes(ymin =sdmin,ymax=sdmax), width = 0.2, position = position_dodge(width = 0.9))+ theme(legend.position = 'bottom',plot.title = element_text(size=12))+theme(axis.text = element_text(size=10,angle=50,hjust=1))
 
