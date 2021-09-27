@@ -276,6 +276,12 @@ Submit any issues, questions, or feature requests to the [Issue Tracker](https:/
 
 [MIT](https://github.com/chiragjp/quantvoe/blob/main/LICENSE)
 
+# Citation
+
+If you use this software, please cite the following manuscript:
+
+Tierney, Braden T., Elizabeth Anderson, Yingxuan Tan, Kajal Claypool, Sivateja Tangirala, Aleksandar D. Kostic, Arjun K. Manrai, and Chirag J. Patel. 2021. “Leveraging Vibration of Effects Analysis for Robust Discovery in Observational Biomedical Data Science.” PLoS Biology 19 (9): e3001398.
+
 # Author
 
 * Braden T Tierney
