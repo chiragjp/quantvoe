@@ -13,6 +13,10 @@ exactly how consistent an association output is. quantvoe can be used for everyt
 clinical to economic data to tackle this problem, moving observational data science towards 
 consistent reproducibility.
 
+For more, check out the manuscript!
+
+https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001398 
+
 ## Theory
 
 The goal of modeling VoE is to use linear modeling to explore, in detail, every way you can model 
