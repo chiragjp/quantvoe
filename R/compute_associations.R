@@ -27,7 +27,7 @@ regression <- function(j,independent_variables,dependent_variables,primary_varia
   #final check to confirm ready for regressions
   #run regression
   if(!is.null(constant_adjusters)){
-    primary_variable_formodel = paste(primary_variable,'+',paste(constant_adjusters,sep='+',collapse='+'))
+    primary_variable_formodel = paste(paste(constant_adjusters,sep='+',collapse='+'),'+',primary_variable)
   }
   if(is.null(constant_adjusters)){
       primary_variable_formodel = primary_variable
