@@ -37,7 +37,7 @@ vibrate <- function(merged_data,variables_to_vibrate,max_vars_in_model,feature,p
     }
     regression_df = merged_data %>% dplyr::select(c(tidyselect::all_of(feature),tidyselect::all_of(constant_adjusters),tidyselect::all_of(primary_variable),tidyselect::all_of(weights),tidyselect::all_of(strata),tidyselect::all_of(ids),tidyselect::all_of(variables_to_vibrate)))
     if(!is.null(constant_adjusters)){
-      primary_variable_formodel = paste(primary_variable,'+',paste(constant_adjusters,sep='+',collapse='+'))
+      primary_variable_formodel = paste(paste(constant_adjusters,sep='+',collapse='+'),'+',primary_variable)
     }
     if(is.null(constant_adjusters)){
       primary_variable_formodel = primary_variable
